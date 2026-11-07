@@ -22,7 +22,7 @@
     </style>
     <script>
         let sheetId = localStorage.getItem('school_asset_sheet_id') || '1xU8DWN6mPCjjzoKRVD1odekK5kUMZadWoslohlNbJR8';
-        let scriptUrl = localStorage.getItem('school_asset_script_url') || 'https://script.google.com/macros/s/AKfycbx0S5d2GT0ZdTHqV3fCldHKG5uzo5HesCJNsUyQc1See2aaPy7HyjXmxJQnRWwXBp--cw/exec';
+        let scriptUrl = localStorage.getItem('school_asset_script_url') || '';
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
 
         let inventoryData = [];
@@ -220,7 +220,6 @@
 
             <!-- Tab: Disposal (จำหน่ายพัสดุ) -->
             <div id="tab-disposal" class="tab-content hidden space-y-6">
-                <!-- Search and Select for Disposal -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 no-print">
                     <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
                         <i data-lucide="archive" class="w-5 h-5 text-rose-600"></i> ค้นหาเพื่อบันทึกจำหน่ายพัสดุออกจากระบบ
@@ -232,7 +231,6 @@
                         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-rose-400"></i>
                     </div>
 
-                    <!-- Result Panel -->
                     <div id="dispose-search-result" class="hidden border border-rose-100 bg-rose-50/50 p-4 rounded-xl space-y-3">
                         <div class="flex justify-between items-start">
                             <div>
@@ -247,7 +245,6 @@
                     </div>
                 </div>
 
-                <!-- Disposed Table Header & Filter -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
                     <div class="flex items-center gap-2">
                         <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
@@ -276,7 +273,6 @@
 
             <!-- Tab: Borrow & Return (ยืม-คืน พัสดุ) -->
             <div id="tab-borrow" class="tab-content hidden space-y-6">
-                <!-- Borrow Form -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-3xl mx-auto no-print">
                     <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
                         <i data-lucide="repeat" class="w-5 h-5 text-indigo-600"></i> บันทึกการยืมพัสดุ / ครุภัณฑ์
@@ -339,7 +335,6 @@
                     </form>
                 </div>
 
-                <!-- Borrow List Header & Table -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
                     <div class="flex items-center gap-2">
                         <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
@@ -374,7 +369,6 @@
                     </div>
                 </div>
 
-                <!-- Printable Official Borrow Report (A4) -->
                 <div id="printable-borrow-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
                     <div class="text-center space-y-1 mb-6">
                         <div class="font-bold text-xl">รายงานสรุปการยืม-คืนพัสดุและครุภัณฑ์</div>
@@ -419,7 +413,6 @@
 
             <!-- Tab: Repair -->
             <div id="tab-repair" class="tab-content hidden space-y-6">
-                <!-- Repair Form -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-3xl mx-auto no-print">
                     <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
                         <i data-lucide="wrench" class="w-5 h-5 text-amber-600"></i> บันทึกแจ้งซ่อมพัสดุ / อุปกรณ์
@@ -468,7 +461,6 @@
                     </form>
                 </div>
 
-                <!-- Active Repair Queue Table -->
                 <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
                     <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                         <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i> รายการพัสดุที่อยู่ระหว่างรอซ่อมบำรุง
@@ -507,7 +499,6 @@
                         </button>
                     </div>
 
-                    <!-- Search and Filters -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-slate-600 mb-1">ค้นหาคำสำคัญ</label>
@@ -570,7 +561,6 @@
                     </div>
                 </div>
 
-                <!-- Printable Official Report Section (A4 Format) -->
                 <div id="printable-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
                     <div class="text-center space-y-1 mb-6">
                         <div class="font-bold text-xl">รายงานสรุปการซ่อมบำรุงพัสดุอุปกรณ์คอมพิวเตอร์</div>
@@ -686,7 +676,7 @@
                                 <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ (โครงสร้าง 10 คอลัมน์ตรงตามฟอร์ม)</p>
                             </div>
                             <div class="flex gap-2">
-                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B.B7%E0%B9%89%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9C%E0%B8%B9%E0%B9%89%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%AD%E0%B8%9A%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%97%E0%B8%A3%E0%B8%AD%E0%B8%99%E0%B8%B4%E0%B8%81%E0%B8%AA%E0%B9%8C,Acer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B.B7%E0%B9%89%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%9C%E0%B8%B9%E0%B9%89%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%97%E0%B8%A3%E0%B8%AD%E0%B8%94%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B8%AA%E0%B9%8C,Acer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดไฟล์ตัวอย่าง CSV
                                 </a>
                                 <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
@@ -993,7 +983,6 @@
         async function postToGoogleSheets(action, payload) {
             try {
                 if (!scriptUrl) return;
-                // เปลี่ยนเป็น mode: 'cors' และรอรับผลลัพธ์ (await) เพื่อให้แน่ใจว่า Apps Script ดำเนินการเสร็จจริง
                 await fetch(scriptUrl, {
                     method: 'POST',
                     mode: 'cors',
@@ -1291,7 +1280,6 @@
             }
         }
 
-        // Disposal Functions
         function searchAssetForDisposal() {
             const query = document.getElementById('dispose-search-input').value.toLowerCase().trim();
             const resultPanel = document.getElementById('dispose-search-result');
@@ -1371,7 +1359,6 @@
             }
         }
 
-        // Borrow Functions
         function filterBorrowAssetOptions() {
             const search = document.getElementById('borrow-search-input').value.toLowerCase().trim();
             const select = document.getElementById('borrow-asset-select');
@@ -1561,7 +1548,6 @@
             window.print();
         }
 
-        // Repair Functions
         function filterRepairAssetOptions() {
             const search = document.getElementById('repair-search-input')?.value.toLowerCase().trim() || '';
             const select = document.getElementById('repair-asset-select');
