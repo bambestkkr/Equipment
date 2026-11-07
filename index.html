@@ -835,7 +835,7 @@
         function restoreDatabase(e) {
             const file = e.target.files[0];
             if (!file) return;
-            if (!confirm("การ Restore จะแทนที่ข้อมูลปัจจุบันด้วยข้อมูลจากไฟล์สำรอง คุณต้องการดำเนินการต่อหรือไม่?")) return;
+            if (!confirm("การ Restore จะแทนที่ข้อมูลปัจจุบันทั้งหมดทั้งในเว็บและใน Google Sheets คุณต้องการดำเนินการต่อหรือไม่?")) return;
             
             const reader = new FileReader();
             reader.onload = async function(event) {
@@ -845,13 +845,25 @@
                     if (data.repairHistory) repairData = data.repairHistory;
                     if (data.future) futureData = data.future;
 
+                    document.getElementById('loading-indicator').classList.remove('hidden');
+                    
+                    // ส่งข้อมูลทั้งหมดไปบันทึกลง Google Sheets ผ่าน Apps Script
+                    await postToGoogleSheets('restoreDatabase', {
+                        inventory: inventoryData,
+                        repairHistory: repairData,
+                        future: futureData
+                    });
+
                     renderInventoryTable();
                     renderRepairDropdown();
                     renderActiveRepairTable();
                     renderHistoryTable();
                     renderFutureTable();
-                    alert("กู้คืนข้อมูล (Restore) สำเร็จเรียบร้อยแล้ว!");
+                    
+                    document.getElementById('loading-indicator').classList.add('hidden');
+                    alert("กู้คืนข้อมูล (Restore) และซิงค์ลง Google Sheets สำเร็จเรียบร้อยแล้ว!");
                 } catch (err) {
+                    document.getElementById('loading-indicator').classList.add('hidden');
                     alert("ไฟล์สำรองข้อมูลไม่ถูกต้องหรือเสียหาย");
                 }
             };
