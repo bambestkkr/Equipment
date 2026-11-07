@@ -1935,25 +1935,37 @@
         }
 
         async function promptClearDatabase() {
+            if (!scriptUrl) {
+                alert("กรุณาตั้งค่า Google Apps Script Web App API URL ก่อนใช้งานฟังก์ชันนี้ (กดปุ่ม 'ตั้งค่า Sheet ID & Web App URL' ด้านบน)");
+                openConfigModal();
+                return;
+            }
             const pwd = prompt("กรุณากรอกรหัส PIN เพื่อยืนยันการล้างฐานข้อมูล:");
             if (pwd === '11052524' || pwd === adminPassword) {
                 if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบถาวรจาก Google Sheets ต้องการดำเนินการหรือไม่?")) {
-                    inventoryData = [];
-                    borrowData = [];
-                    repairData = [];
-                    futureData = [];
+                    document.getElementById('loading-indicator').classList.remove('hidden');
+                    try {
+                        const res = await postToGoogleSheets('clearDatabase', {});
+                        inventoryData = [];
+                        borrowData = [];
+                        repairData = [];
+                        futureData = [];
 
-                    renderInventoryTable();
-                    renderDisposedTable();
-                    renderBorrowTable();
-                    renderActiveRepairTable();
-                    renderHistoryTable();
-                    renderFutureTable();
+                        renderInventoryTable();
+                        renderDisposedTable();
+                        renderBorrowTable();
+                        renderActiveRepairTable();
+                        renderHistoryTable();
+                        renderFutureTable();
 
-                    // รอให้ส่งคำสั่งลบไปยัง Google Sheets เสร็จสิ้นก่อน
-                    await postToGoogleSheets('clearDatabase', {});
-                    alert("ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว");
-                    await fetchGoogleSheetsData();
+                        alert("ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว");
+                        await fetchGoogleSheetsData();
+                    } catch (err) {
+                        console.error("Clear database error:", err);
+                        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Apps Script");
+                    } finally {
+                        document.getElementById('loading-indicator').classList.add('hidden');
+                    }
                 }
             } else if (pwd !== null) {
                 alert("รหัสผ่านไม่ถูกต้อง");
