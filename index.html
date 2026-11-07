@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบทะเบียนคุมพัสดุอุปกรณ์คอมพิวเตอร์ครูศรันย์กรณ์</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center border border-slate-100">
+            <div class="mb-6 flex justify-center">
+                <img src="https://i.ibb.co/GQqkFPsY/jaae-PNGTran-small.png" alt="Logo" class="w-28 h-28 object-cover rounded-full shadow-md border-4 border-indigo-50">
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">ระบบทะเบียนคุมพัสดุอุปกรณ์คอมพิวเตอร์</h2>
+            <p class="text-sm text-slate-500 mb-6">ครูศรันย์กรณ์ อาจณรงค์กร • โรงเรียนคงคาราม</p>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่านผู้ดูแลระบบ (Admin Password)</label>
+                    <input type="password" id="login-password" required placeholder="กรอกรหัสผ่าน" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                </div>
+                <div id="login-error" class="text-red-500 text-sm hidden">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</div>
+                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition duration-200">เข้าสู่ระบบ</button>
+            </form>
+            <div class="mt-6 text-xs text-slate-400">Database Connected via Google Sheets Direct Stream</div>
+        </div>
+    </div>
+
+    <!-- Main App Content -->
+    <div id="app-content" class="hidden flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="https://i.ibb.co/GQqkFPsY/jaae-PNGTran-small.png" alt="Logo" class="w-10 h-10 object-cover rounded-full border border-indigo-100 shadow-sm">
+                    <div>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">ระบบทะเบียนคุมพัสดุอุปกรณ์คอมพิวเตอร์</h1>
+                        <p class="text-xs text-slate-500">ครูศรันย์กรณ์ อาจณรงค์กร • รร.คงคาราม</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openConfigModal()" class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+                        <i data-lucide="settings" class="w-4 h-4"></i> ตั้งค่าเชื่อมต่อ
+                    </button>
+                    <button onclick="handleLogout()" class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+            <!-- Navigation Tabs -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 sm:space-x-4 overflow-x-auto border-t border-slate-100">
+                <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="box" class="w-4 h-4"></i> ทะเบียนพัสดุ
+                </button>
+                <button onclick="switchTab('repair')" id="tab-btn-repair" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="wrench" class="w-4 h-4"></i> แจ้งซ่อม
+                </button>
+                <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="clipboard-list" class="w-4 h-4"></i> ประวัติการซ่อม
+                </button>
+                <button onclick="switchTab('future')" id="tab-btn-future" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="calendar-plus" class="w-4 h-4"></i> พัสดุปีหน้า
+                </button>
+                <button onclick="switchTab('database')" id="tab-btn-database" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="database" class="w-4 h-4"></i> จัดการฐานข้อมูล & เอกสาร
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="flex items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+                <span class="ml-3 text-slate-600 font-medium">กำลังดึงข้อมูลสดจาก Google Sheets...</span>
+            </div>
+
+            <!-- Tab 1: Inventory -->
+            <div id="tab-inventory" class="tab-content space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <input type="text" id="search-input" oninput="filterInventory()" placeholder="ค้นหาเลขครุภัณฑ์, ชื่อ, รุ่น..." class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-72 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                        <select id="category-filter" onchange="filterInventory()" class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-48 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                            <option value="">ทุกประเภท</option>
+                            <option value="คอมพิวเตอร์/อิเล็กทรอนิกส์">คอมพิวเตอร์/อิเล็กทรอนิกส์</option>
+                            <option value="ครุภัณฑ์/เฟอร์นิเจอร์">ครุภัณฑ์/เฟอร์นิเจอร์</option>
+                            <option value="โสตทัศนูปกรณ์">โสตทัศนูปกรณ์</option>
+                            <option value="อุปกรณ์วิทยาศาสตร์">อุปกรณ์วิทยาศาสตร์</option>
+                            <option value="อุปกรณ์กีฬา">อุปกรณ์กีฬา</option>
+                            <option value="ดนตรี/นาฏศิลป์">ดนตรี/นาฏศิลป์</option>
+                            <option value="วัสดุสำนักงาน">วัสดุสำนักงาน</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <button onclick="openInventoryModal()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm text-sm font-medium transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มรายการพัสดุ
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">เลขครุภัณฑ์</th>
+                                    <th class="p-4">ชื่อพัสดุ / รุ่น</th>
+                                    <th class="p-4">ประเภท</th>
+                                    <th class="p-4">ปี / สเปก</th>
+                                    <th class="p-4">หน่วยงาน / ห้อง</th>
+                                    <th class="p-4">ผู้รับผิดชอบ</th>
+                                    <th class="p-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-100">
+                                <!-- Data rendered dynamically from Google Sheet -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Repair Form -->
+            <div id="tab-repair" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
+                        <i data-lucide="wrench" class="w-5 h-5 text-yellow-600"></i> บันทึกแจ้งซ่อมพัสดุ
+                    </h2>
+                    <p class="text-xs text-slate-500 mb-6">บันทึกประวัติการส่งซ่อมหรือชำรุดของอุปกรณ์</p>
+                    <form onsubmit="handleRepairSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">เลือกพัสดุที่ต้องการแจ้งซ่อม *</label>
+                            <select id="repair-asset-select" required onchange="onRepairAssetSelected()" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">-- กรุณาเลือกพัสดุ --</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">เลขครุภัณฑ์</label>
+                                <input type="text" id="repair-asset-number" readonly class="w-full p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-600">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อพัสดุ</label>
+                                <input type="text" id="repair-asset-name" readonly class="w-full p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-600">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">อาการที่พบ / ปัญหา *</label>
+                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการชำรุด..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่พบ *</label>
+                                <input type="date" id="repair-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้ง *</label>
+                                <input type="text" id="repair-receiver" required placeholder="ชื่อ-นามสกุลผู้แจ้ง" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                            <button type="submit" class="px-6 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg shadow-sm text-sm transition">บันทึกแจ้งซ่อม</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab 3: Repair History -->
+            <div id="tab-history" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> ประวัติการซ่อมบำรุง
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">รหัสการซ่อม</th>
+                                    <th class="p-4">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
+                                    <th class="p-4">อาการที่พบ</th>
+                                    <th class="p-4">วันที่แจ้ง / ผู้แจ้ง</th>
+                                    <th class="p-4">สาเหตุและการแก้ไข</th>
+                                    <th class="p-4">ผลการซ่อม</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="divide-y divide-slate-100">
+                                <!-- Data rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Future Planning -->
+            <div id="tab-future" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="calendar-plus" class="w-5 h-5 text-indigo-600"></i> ข้อมูลพัสดุปีหน้า
+                        </h2>
+                        <p class="text-xs text-slate-500">รายการวางแผนจัดซื้อ/จัดหาพัสดุล่วงหน้า</p>
+                    </div>
+                    <button onclick="openFutureModal()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm text-sm font-medium transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มรายการปีหน้า
+                    </button>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4 w-16 text-center">ลำดับ</th>
+                                    <th class="p-4">ชื่อรายการ</th>
+                                    <th class="p-4">รายละเอียด</th>
+                                    <th class="p-4 text-center">จำนวน</th>
+                                    <th class="p-4">ลิ้งค์ข้อมูล</th>
+                                    <th class="p-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="future-table-body" class="divide-y divide-slate-100">
+                                <!-- Data rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Database & Docs -->
+            <div id="tab-database" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
+                            <i data-lucide="database" class="w-5 h-5 text-indigo-600"></i> การเชื่อมโยง Google Sheets & สำรองข้อมูล
+                        </h2>
+                        <p class="text-sm text-slate-500">ระบบเชื่อมต่อโดยตรงกับ Google Sheets ดึงข้อมูลสดผ่าน Sheet ID ที่กำหนด</p>
+                    </div>
+                    <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <div class="text-sm font-bold text-indigo-900">Google Sheet ID ปัจจุบัน:</div>
+                            <div id="display-sheet-id" class="text-xs font-mono text-indigo-700 bg-white px-2 py-1 rounded border border-indigo-200 mt-1"></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openConfigModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition shadow-sm">ตั้งค่า Sheet ID & Web App URL</button>
+                            <button onclick="fetchGoogleSheetsData()" class="px-4 py-2 bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-300 rounded-lg text-sm font-medium transition">รีเฟรชข้อมูลสด</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Inventory Modal -->
+    <div id="inventory-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden my-8">
+            <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
+                <h3 id="inventory-modal-title" class="font-bold text-lg">เพิ่มรายการพัสดุ</h3>
+                <button onclick="closeInventoryModal()" class="text-white hover:bg-indigo-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="inventory-form" onsubmit="handleInventorySubmit(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <input type="hidden" id="inv-edit-index" value="">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">เลขครุภัณฑ์ *</label>
+                        <input type="text" id="inv-assetNumber" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อพัสดุ *</label>
+                        <input type="text" id="inv-assetName" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ประเภท *</label>
+                        <select id="inv-category" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="คอมพิวเตอร์/อิเล็กทรอนิกส์">คอมพิวเตอร์/อิเล็กทรอนิกส์</option>
+                            <option value="ครุภัณฑ์/เฟอร์นิเจอร์">ครุภัณฑ์/เฟอร์นิเจอร์</option>
+                            <option value="โสตทัศนูปกรณ์">โสตทัศนูปกรณ์</option>
+                            <option value="อุปกรณ์วิทยาศาสตร์">อุปกรณ์วิทยาศาสตร์</option>
+                            <option value="อุปกรณ์กีฬา">อุปกรณ์กีฬา</option>
+                            <option value="ดนตรี/นาฏศิลป์">ดนตรี/นาฏศิลป์</option>
+                            <option value="วัสดุสำนักงาน">วัสดุสำนักงาน</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ยี่ห้อ / รุ่น</label>
+                        <input type="text" id="inv-brandModel" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ปีที่ลงทะเบียน</label>
+                        <input type="text" id="inv-registrationYear" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ประจำห้อง</label>
+                        <input type="text" id="inv-location" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">หน่วยงาน</label>
+                        <input type="text" id="inv-department" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ครูผู้รับผิดชอบ</label>
+                        <input type="text" id="inv-teacherInCharge" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">คุณลักษณะเฉพาะ</label>
+                    <textarea id="inv-specifications" rows="2" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ลิ้งภาพประกอบ (URL)</label>
+                    <input type="url" id="inv-imageUrl" placeholder="https://..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeInventoryModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Future Modal -->
+    <div id="future-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
+                <h3 id="future-modal-title" class="font-bold text-lg">เพิ่มรายการพัสดุปีหน้า</h3>
+                <button onclick="closeFutureModal()" class="text-white hover:bg-indigo-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="future-form" onsubmit="handleFutureSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="fut-edit-index" value="">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อรายการ *</label>
+                    <input type="text" id="fut-itemName" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รายละเอียด</label>
+                    <textarea id="fut-details" rows="2" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">จำนวน *</label>
+                        <input type="number" min="1" id="fut-quantity" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ลิ้งค์ข้อมูล (URL)</label>
+                        <input type="url" id="fut-dataLink" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeFutureModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Config Modal (Sheet ID & Script URL) -->
+    <div id="config-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="px-6 py-4 bg-slate-800 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg">ตั้งค่า Google Sheet & Apps Script</h3>
+                <button onclick="closeConfigModal()" class="text-white hover:bg-slate-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Google Sheet ID</label>
+                    <input type="text" id="config-sheet-id-input" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <p class="text-xs text-slate-500 mt-1">ID ของไฟล์ Google Sheet ที่ดึงข้อมูล CSV</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Google Apps Script Web App API URL</label>
+                    <input type="url" id="config-script-url-input" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <p class="text-xs text-slate-500 mt-1">URL Web App จากการ Deploy เพื่อซิงค์ข้อมูลถาวร</p>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeConfigModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium">ยกเลิก</button>
+                    <button type="button" onclick="saveConfigSheetId()" class="px-6 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium shadow-sm">บันทึกและโหลดใหม่</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let sheetId = localStorage.getItem('school_asset_sheet_id') || '1xU8DWN6mPCjjzoKRVD1odekK5kUMZadWoslohlNbJR8';
+        let scriptUrl = localStorage.getItem('school_asset_script_url') || 'https://script.google.com/macros/s/AKfycbx0S5d2GT0ZdTHqV3fCldHKG5uzo5HesCJNsUyQc1See2aaPy7HyjXmxJQnRWwXBp--cw/exec';
+        let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
+
+        let inventoryData = [];
+        let repairData = [];
+        let futureData = [];
+
+        // Check authentication on load
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            document.getElementById('display-sheet-id').innerText = sheetId;
+            document.getElementById('config-sheet-id-input').value = sheetId;
+            document.getElementById('config-script-url-input').value = scriptUrl;
+
+            const isAuth = sessionStorage.getItem('school_asset_auth');
+            if (isAuth === 'true') {
+                showApp();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const pwd = document.getElementById('login-password').value;
+            if (pwd === adminPassword) {
+                sessionStorage.setItem('school_asset_auth', 'true');
+                document.getElementById('login-error').classList.add('hidden');
+                showApp();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('school_asset_auth');
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+        }
+
+        function showApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-content').classList.remove('hidden');
+            fetchGoogleSheetsData();
+        }
+
+        // CSV Parser utility
+        function parseCSV(text) {
+            let lines = text.split("\n");
+            let result = [];
+            for (let i = 0; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if (!currentLine) continue;
+                let row = [];
+                let inColumns = false;
+                let entry = '';
+                for (let c = 0; c < currentLine.length; c++) {
+                    let char = currentLine[c];
+                    if (char === '"') {
+                        inColumns = !inColumns;
+                    } else if (char === ',' && !inColumns) {
+                        row.push(entry.trim());
+                        entry = '';
+                    } else {
+                        entry += char;
+                    }
+                }
+                row.push(entry.trim());
+                result.push(row);
+            }
+            return result;
+        }
+
+        async function fetchGoogleSheetsData() {
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            try {
+                // Fetch school_inventory_v2 directly from Google Sheet CSV Export
+                const invUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=school_inventory_v2`;
+                const invRes = await fetch(invUrl);
+                const invText = await invRes.text();
+                const invRows = parseCSV(invText);
+                
+                inventoryData = [];
+                if (invRows.length > 1) {
+                    for (let i = 1; i < invRows.length; i++) {
+                        let r = invRows[i];
+                        if (r.length >= 2 && r[0]) {
+                            inventoryData.push({
+                                assetNumber: r[0] || '',
+                                assetName: r[1] || '',
+                                category: r[2] || '',
+                                brandModel: r[3] || '',
+                                registrationYear: r[4] || '',
+                                specifications: r[5] || '',
+                                department: r[6] || '',
+                                teacherInCharge: r[7] || '',
+                                location: r[8] || '',
+                                imageUrl: r[9] || ''
+                            });
+                        }
+                    }
+                }
+
+                // Fetch repair_history
+                try {
+                    const repUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=repair_history`;
+                    const repRes = await fetch(repUrl);
+                    const repText = await repRes.text();
+                    const repRows = parseCSV(repText);
+                    repairData = [];
+                    if (repRows.length > 1) {
+                        for (let i = 1; i < repRows.length; i++) {
+                            let r = repRows[i];
+                            if (r.length >= 2 && r[0]) {
+                                repairData.push({
+                                    repairId: r[0] || '',
+                                    assetNumber: r[1] || '',
+                                    assetName: r[2] || '',
+                                    issue: r[3] || '',
+                                    dateFound: r[4] || '',
+                                    receiver: r[5] || '',
+                                    cause: r[6] || '',
+                                    solution: r[7] || '',
+                                    finishDate: r[8] || '',
+                                    status: r[9] || 'ปกติ'
+                                });
+                            }
+                        }
+                    }
+                } catch(e) { console.log("Repair history sheet error or empty"); }
+
+                // Fetch future_inventory
+                try {
+                    const futUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=future_inventory`;
+                    const futRes = await fetch(futUrl);
+                    const futText = await futRes.text();
+                    const futRows = parseCSV(futText);
+                    futureData = [];
+                    if (futRows.length > 1) {
+                        for (let i = 1; i < futRows.length; i++) {
+                            let r = futRows[i];
+                            if (r.length >= 2 && r[1]) {
+                                futureData.push({
+                                    no: r[0] || i,
+                                    itemName: r[1] || '',
+                                    details: r[2] || '',
+                                    quantity: r[3] || '1',
+                                    dataLink: r[4] || ''
+                                });
+                            }
+                        }
+                    }
+                } catch(e) { console.log("Future inventory sheet error or empty"); }
+
+                renderInventoryTable();
+                renderRepairDropdown();
+                renderHistoryTable();
+                renderFutureTable();
+            } catch (err) {
+                console.error("Error fetching Google Sheets:", err);
+                alert("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้ กรุณาตรวจสอบว่าไฟล์ Google Sheet ตั้งค่าการแชร์เป็น 'ทุกคนที่มีลิงก์ (Anyone with the link)' หรือไม่");
+            } finally {
+                document.getElementById('loading-indicator').classList.add('hidden');
+            }
+        }
+
+        async function postToGoogleSheets(action, payload) {
+            if (!scriptUrl) return false;
+            try {
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: action, sheetId: sheetId, payload: payload })
+                });
+                return true;
+            } catch (err) {
+                console.error("API Sync Error:", err);
+                return false;
+            }
+        }
+
+        // Tab Navigation
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-indigo-600', 'text-indigo-600');
+                el.classList.add('border-transparent', 'text-slate-600');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).classList.add('border-indigo-600', 'text-indigo-600');
+            document.getElementById(`tab-btn-${tabName}`).classList.remove('border-transparent', 'text-slate-600');
+            lucide.createIcons();
+        }
+
+        // Render Inventory Table
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+
+            const filtered = inventoryData.filter(item => {
+                const matchSearch = (item.assetNumber + ' ' + item.assetName + ' ' + item.brandModel).toLowerCase().includes(search);
+                const matchCat = !category || item.category === category;
+                return matchSearch && matchCat;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบรายการพัสดุใน Google Sheet นี้</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 font-mono font-medium text-slate-800">${item.assetNumber}</td>
+                    <td class="p-4">
+                        <div class="font-bold text-slate-900">${item.assetName}</div>
+                        <div class="text-xs text-slate-500">${item.brandModel || '-'}</div>
+                    </td>
+                    <td class="p-4"><span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full text-xs font-semibold">${item.category || '-'}</span></td>
+                    <td class="p-4 text-xs text-slate-600">
+                        <div>ปี: ${item.registrationYear || '-'}</div>
+                        <div class="truncate max-w-xs" title="${item.specifications}">${item.specifications || '-'}</div>
+                    </td>
+                    <td class="p-4 text-xs text-slate-600">
+                        <div>${item.department || '-'}</div>
+                        <div class="text-slate-400">${item.location || '-'}</div>
+                    </td>
+                    <td class="p-4 text-xs text-slate-700 font-medium">${item.teacherInCharge || '-'}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editInventory(${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 rounded">แก้ไข</button>
+                        <button onclick="deleteInventory(${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2.5 py-1 bg-red-50 hover:bg-red-100 rounded">ลบ</button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function filterInventory() {
+            renderInventoryTable();
+        }
+
+        // Inventory Modals & CRUD
+        function openInventoryModal(editIdx = null) {
+            document.getElementById('inventory-modal').classList.remove('hidden');
+            if (editIdx !== null) {
+                document.getElementById('inventory-modal-title').innerText = 'แก้ไขรายการพัสดุ';
+                document.getElementById('inv-edit-index').value = editIdx;
+                const item = inventoryData[editIdx];
+                document.getElementById('inv-assetNumber').value = item.assetNumber;
+                document.getElementById('inv-assetName').value = item.assetName;
+                document.getElementById('inv-category').value = item.category || 'คอมพิวเตอร์/อิเล็กทรอนิกส์';
+                document.getElementById('inv-brandModel').value = item.brandModel;
+                document.getElementById('inv-registrationYear').value = item.registrationYear;
+                document.getElementById('inv-location').value = item.location;
+                document.getElementById('inv-department').value = item.department;
+                document.getElementById('inv-teacherInCharge').value = item.teacherInCharge;
+                document.getElementById('inv-specifications').value = item.specifications;
+                document.getElementById('inv-imageUrl').value = item.imageUrl;
+            } else {
+                document.getElementById('inventory-modal-title').innerText = 'เพิ่มรายการพัสดุ';
+                document.getElementById('inventory-form').reset();
+                document.getElementById('inv-edit-index').value = '';
+            }
+        }
+
+        function closeInventoryModal() {
+            document.getElementById('inventory-modal').classList.add('hidden');
+        }
+
+        async function handleInventorySubmit(e) {
+            e.preventDefault();
+            const editIdx = document.getElementById('inv-edit-index').value;
+            const newItem = {
+                assetNumber: document.getElementById('inv-assetNumber').value,
+                assetName: document.getElementById('inv-assetName').value,
+                category: document.getElementById('inv-category').value,
+                brandModel: document.getElementById('inv-brandModel').value,
+                registrationYear: document.getElementById('inv-registrationYear').value,
+                specifications: document.getElementById('inv-specifications').value,
+                department: document.getElementById('inv-department').value,
+                teacherInCharge: document.getElementById('inv-teacherInCharge').value,
+                location: document.getElementById('inv-location').value,
+                imageUrl: document.getElementById('inv-imageUrl').value
+            };
+
+            if (editIdx !== '') {
+                inventoryData[editIdx] = newItem;
+            } else {
+                inventoryData.unshift(newItem);
+            }
+            renderInventoryTable();
+            closeInventoryModal();
+
+            // Sync to Google Sheets API
+            await postToGoogleSheets('saveInventory', newItem);
+            alert("บันทึกข้อมูลและซิงค์ลง Google Sheets เรียบร้อยแล้ว!");
+        }
+
+        function editInventory(idx) {
+            openInventoryModal(idx);
+        }
+
+        async function deleteInventory(idx) {
+            if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
+                const target = inventoryData[idx];
+                inventoryData.splice(idx, 1);
+                renderInventoryTable();
+                await postToGoogleSheets('deleteInventory', { assetNumber: target.assetNumber });
+                alert("ลบข้อมูลและอัปเดต Google Sheets เรียบร้อยแล้ว!");
+            }
+        }
+
+        // Repair Tab
+        function renderRepairDropdown() {
+            const select = document.getElementById('repair-asset-select');
+            select.innerHTML = `<option value="">-- กรุณาเลือกพัสดุ --</option>` + inventoryData.map((item, idx) => `
+                <option value="${idx}">${item.assetNumber} - ${item.assetName}</option>
+            `).join('');
+            document.getElementById('repair-date').value = new Date().toISOString().substring(0, 10);
+        }
+
+        function onRepairAssetSelected() {
+            const idx = document.getElementById('repair-asset-select').value;
+            if (idx !== '') {
+                const item = inventoryData[idx];
+                document.getElementById('repair-asset-number').value = item.assetNumber;
+                document.getElementById('repair-asset-name').value = item.assetName;
+            } else {
+                document.getElementById('repair-asset-number').value = '';
+                document.getElementById('repair-asset-name').value = '';
+            }
+        }
+
+        async function handleRepairSubmit(e) {
+            e.preventDefault();
+            const newRepair = {
+                repairId: 'RP-' + new Date().getFullYear() + '-' + String(repairData.length + 1).padStart(3, '0'),
+                assetNumber: document.getElementById('repair-asset-number').value,
+                assetName: document.getElementById('repair-asset-name').value,
+                issue: document.getElementById('repair-issue').value,
+                dateFound: document.getElementById('repair-date').value,
+                receiver: document.getElementById('repair-receiver').value,
+                cause: 'กำลังตรวจสอบ',
+                solution: 'รอซ่อมบำรุง',
+                finishDate: '-',
+                status: 'รอซ่อม'
+            };
+            repairData.unshift(newRepair);
+            renderHistoryTable();
+            await postToGoogleSheets('saveRepair', newRepair);
+            alert("บันทึกแจ้งซ่อมและซิงค์ลง Google Sheets เรียบร้อยแล้ว!");
+            e.target.reset();
+            document.getElementById('repair-date').value = new Date().toISOString().substring(0, 10);
+            switchTab('history');
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            if (repairData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการแจ้งซ่อม</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = repairData.map(item => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 font-mono font-medium text-indigo-600">${item.repairId}</td>
+                    <td class="p-4">
+                        <div class="font-bold text-slate-800">${item.assetName}</div>
+                        <div class="text-xs font-mono text-slate-500">${item.assetNumber}</div>
+                    </td>
+                    <td class="p-4 text-xs text-slate-700">${item.issue}</td>
+                    <td class="p-4 text-xs text-slate-600">
+                        <div>${item.dateFound}</div>
+                        <div class="text-slate-400">ผู้แจ้ง: ${item.receiver}</div>
+                    </td>
+                    <td class="p-4 text-xs text-slate-600">
+                        <div><strong>สาเหตุ:</strong> ${item.cause}</div>
+                        <div><strong>แก้ไข:</strong> ${item.solution}</div>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'ปกติ' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}">${item.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Future Tab
+        function renderFutureTable() {
+            const tbody = document.getElementById('future-table-body');
+            if (futureData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลพัสดุปีหน้า</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = futureData.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 text-center font-medium text-slate-500">${item.no || (idx + 1)}</td>
+                    <td class="p-4 font-bold text-slate-900">${item.itemName}</td>
+                    <td class="p-4 text-xs text-slate-600">${item.details || '-'}</td>
+                    <td class="p-4 text-center"><span class="bg-slate-100 px-2 py-1 rounded font-bold text-slate-700">${item.quantity}</span></td>
+                    <td class="p-4 text-xs">${item.dataLink ? `<a href="${item.dataLink}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1">เปิดลิงก์ <i data-lucide="external-link" class="w-3 h-3"></i></a>` : '-'}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editFuture(${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 rounded">แก้ไข</button>
+                        <button onclick="deleteFuture(${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2.5 py-1 bg-red-50 hover:bg-red-100 rounded">ลบ</button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function openFutureModal(editIdx = null) {
+            document.getElementById('future-modal').classList.remove('hidden');
+            if (editIdx !== null) {
+                document.getElementById('future-modal-title').innerText = 'แก้ไขรายการพัสดุปีหน้า';
+                document.getElementById('fut-edit-index').value = editIdx;
+                const item = futureData[editIdx];
+                document.getElementById('fut-itemName').value = item.itemName;
+                document.getElementById('fut-details').value = item.details;
+                document.getElementById('fut-quantity').value = item.quantity;
+                document.getElementById('fut-dataLink').value = item.dataLink;
+            } else {
+                document.getElementById('future-modal-title').innerText = 'เพิ่มรายการพัสดุปีหน้า';
+                document.getElementById('future-form').reset();
+                document.getElementById('fut-edit-index').value = '';
+            }
+        }
+
+        function closeFutureModal() {
+            document.getElementById('future-modal').classList.add('hidden');
+        }
+
+        async function handleFutureSubmit(e) {
+            e.preventDefault();
+            const editIdx = document.getElementById('fut-edit-index').value;
+            const newItem = {
+                no: editIdx !== '' ? futureData[editIdx].no : futureData.length + 1,
+                itemName: document.getElementById('fut-itemName').value,
+                details: document.getElementById('fut-details').value,
+                quantity: document.getElementById('fut-quantity').value,
+                dataLink: document.getElementById('fut-dataLink').value
+            };
+            if (editIdx !== '') {
+                futureData[editIdx] = newItem;
+            } else {
+                futureData.push(newItem);
+            }
+            renderFutureTable();
+            closeFutureModal();
+            await postToGoogleSheets('saveFuture', newItem);
+            alert("บันทึกแผนพัสดุปีหน้าเรียบร้อยแล้ว!");
+        }
+
+        function editFuture(idx) {
+            openFutureModal(idx);
+        }
+
+        async function deleteFuture(idx) {
+            if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
+                futureData.splice(idx, 1);
+                renderFutureTable();
+                await postToGoogleSheets('deleteFuture', { index: idx });
+                alert("ลบรายการแผนปีหน้าเรียบร้อยแล้ว!");
+            }
+        }
+
+        // Config Modal Functions
+        function openConfigModal() {
+            document.getElementById('config-sheet-id-input').value = sheetId;
+            document.getElementById('config-script-url-input').value = scriptUrl;
+            document.getElementById('config-modal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+        }
+
+        function saveConfigSheetId() {
+            const newId = document.getElementById('config-sheet-id-input').value.trim();
+            const newUrl = document.getElementById('config-script-url-input').value.trim();
+            if (newId) {
+                sheetId = newId;
+                scriptUrl = newUrl;
+                localStorage.setItem('school_asset_sheet_id', sheetId);
+                localStorage.setItem('school_asset_script_url', scriptUrl);
+                document.getElementById('display-sheet-id').innerText = sheetId;
+                closeConfigModal();
+                fetchGoogleSheetsData();
+                alert("บันทึกการตั้งค่า Google Sheet ID และ Script Web App URL เรียบร้อยแล้ว!");
+            } else {
+                alert("กรุณากรอก Google Sheet ID ให้ถูกต้อง");
+            }
+        }
+    </script>
+</body>
+</html>
