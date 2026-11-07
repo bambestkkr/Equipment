@@ -21,7 +21,7 @@
         .print-only { display: none; }
     </style>
     <script>
-        let sheetId = localStorage.getItem('school_asset_sheet_id') || '1IAURmSXWIIt7c4zAXaQaAJMN08fslDujD6O7DLZipmo';
+        let sheetId = localStorage.getItem('school_asset_sheet_id') || '1xU8DWN6mPCjjzoKRVD1odekK5kUMZadWoslohlNbJR8';
         let scriptUrl = localStorage.getItem('school_asset_script_url') || '';
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
 
@@ -993,9 +993,10 @@
         async function postToGoogleSheets(action, payload) {
             try {
                 if (!scriptUrl) return;
+                // เปลี่ยนเป็น mode: 'cors' และรอรับผลลัพธ์ (await) เพื่อให้แน่ใจว่า Apps Script ดำเนินการเสร็จจริง
                 await fetch(scriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         sheetId: sheetId,
@@ -1936,7 +1937,7 @@
         async function promptClearDatabase() {
             const pwd = prompt("กรุณากรอกรหัส PIN เพื่อยืนยันการล้างฐานข้อมูล:");
             if (pwd === '11052524' || pwd === adminPassword) {
-                if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบถาวร ต้องการดำเนินการหรือไม่?")) {
+                if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบถาวรจาก Google Sheets ต้องการดำเนินการหรือไม่?")) {
                     inventoryData = [];
                     borrowData = [];
                     repairData = [];
@@ -1949,8 +1950,10 @@
                     renderHistoryTable();
                     renderFutureTable();
 
+                    // รอให้ส่งคำสั่งลบไปยัง Google Sheets เสร็จสิ้นก่อน
                     await postToGoogleSheets('clearDatabase', {});
-                    alert("ล้างฐานข้อมูลเรียบร้อยแล้ว");
+                    alert("ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว");
+                    await fetchGoogleSheetsData();
                 }
             } else if (pwd !== null) {
                 alert("รหัสผ่านไม่ถูกต้อง");
