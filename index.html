@@ -12,11 +12,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; }
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .page-break { page-break-after: always; }
+        }
+        .print-only { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
     <!-- Login Screen -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="login-screen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center border border-slate-100">
             <div class="mb-6 flex justify-center">
                 <img src="https://i.ibb.co/GQqkFPsY/jaae-PNGTran-small.png" alt="Logo" class="w-28 h-28 object-cover rounded-full shadow-md border-4 border-indigo-50">
@@ -38,7 +45,7 @@
     <!-- Main App Content -->
     <div id="app-content" class="hidden flex-1 flex flex-col">
         <!-- Header -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <img src="https://i.ibb.co/GQqkFPsY/jaae-PNGTran-small.png" alt="Logo" class="w-10 h-10 object-cover rounded-full border border-indigo-100 shadow-sm">
@@ -65,7 +72,7 @@
                     <i data-lucide="wrench" class="w-4 h-4"></i> แจ้งซ่อม
                 </button>
                 <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
-                    <i data-lucide="clipboard-list" class="w-4 h-4"></i> ประวัติการซ่อม
+                    <i data-lucide="clipboard-list" class="w-4 h-4"></i> ประวัติการซ่อม & รายงาน
                 </button>
                 <button onclick="switchTab('future')" id="tab-btn-future" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
                     <i data-lucide="calendar-plus" class="w-4 h-4"></i> พัสดุปีหน้า
@@ -79,7 +86,7 @@
         <!-- Main Content Area -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
             <!-- Loading Indicator -->
-            <div id="loading-indicator" class="flex items-center justify-center py-12">
+            <div id="loading-indicator" class="flex items-center justify-center py-12 no-print">
                 <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
                 <span class="ml-3 text-slate-600 font-medium">กำลังดึงข้อมูลสดจาก Google Sheets...</span>
             </div>
@@ -129,23 +136,31 @@
             </div>
 
             <!-- Tab 2: Repair Form -->
-            <div id="tab-repair" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
+            <div id="tab-repair" class="tab-content hidden space-y-6 max-w-4xl mx-auto">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                     <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
                         <i data-lucide="wrench" class="w-5 h-5 text-yellow-600"></i> บันทึกแจ้งซ่อมพัสดุ
                     </h2>
-                    <p class="text-xs text-slate-500 mb-6">บันทึกประวัติการส่งซ่อมหรือชำรุดของอุปกรณ์</p>
+                    <p class="text-xs text-slate-500 mb-6">บันทึกรายการอุปกรณ์ชำรุดเข้าสู่ระบบเพื่อรอการดำเนินการซ่อมบำรุง</p>
                     <form onsubmit="handleRepairSubmit(event)" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">เลือกพัสดุที่ต้องการแจ้งซ่อม *</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">ค้นหาและเลือกพัสดุที่ต้องการแจ้งซ่อม *</label>
+                            <div class="flex gap-2 mb-2">
+                                <div class="relative flex-1">
+                                    <input type="text" id="repair-search-input" oninput="filterRepairAssetOptions()" placeholder="พิมพ์เลขครุภัณฑ์ หรือ ชื่อพัสดุ เพื่อค้นหา..." class="w-full px-3 py-2 pl-9 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                                </div>
+                                <button type="button" onclick="clearRepairAssetSearch()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium">ล้างคำค้น</button>
+                            </div>
                             <select id="repair-asset-select" required onchange="onRepairAssetSelected()" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">-- กรุณาเลือกพัสดุ --</option>
                             </select>
+                            <div id="repair-search-count" class="text-xs text-indigo-600 font-medium mt-1"></div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">เลขครุภัณฑ์</label>
-                                <input type="text" id="repair-asset-number" readonly class="w-full p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-600">
+                                <input type="text" id="repair-asset-number" readonly class="w-full p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-600 font-mono">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อพัสดุ</label>
@@ -154,16 +169,16 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">อาการที่พบ / ปัญหา *</label>
-                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการชำรุด..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการชำรุดอย่างละเอียด..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่พบ *</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่พบอาการ *</label>
                                 <input type="date" id="repair-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้ง *</label>
-                                <input type="text" id="repair-receiver" required placeholder="ชื่อ-นามสกุลผู้แจ้ง" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้งซ่อม *</label>
+                                <input type="text" id="repair-receiver" required placeholder="ระบุชื่อ-นามสกุลผู้แจ้งซ่อม" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                         <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
@@ -171,19 +186,82 @@
                         </div>
                     </form>
                 </div>
-            </div>
 
-            <!-- Tab 3: Repair History -->
-            <div id="tab-history" class="tab-content hidden space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 flex justify-between items-center">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> ประวัติการซ่อมบำรุง
-                        </h2>
+                    <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i> รายการพัสดุที่อยู่ระหว่างแจ้งซ่อม
+                            </h3>
+                            <p class="text-xs text-slate-500">คลิกปุ่ม "บันทึกผลการซ่อม" เพื่อบันทึกผลและย้ายไปยังประวัติการซ่อม</p>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3.5">รหัสการซ่อม</th>
+                                    <th class="p-3.5">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
+                                    <th class="p-3.5">อาการที่พบ</th>
+                                    <th class="p-3.5">วันที่แจ้ง / ผู้แจ้ง</th>
+                                    <th class="p-3.5">สถานะ</th>
+                                    <th class="p-3.5 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repair-active-table-body" class="divide-y divide-slate-100">
+                                <!-- Active repairs rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Repair History & Report Engine -->
+            <div id="tab-history" class="tab-content hidden space-y-6">
+                <!-- Filter & Action Bar -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <div class="relative flex-1 md:w-64">
+                            <input type="text" id="history-search" oninput="renderHistoryTable()" placeholder="สืบค้นเลขครุภัณฑ์, ชื่อ, อาการ..." class="w-full px-3 py-2 pl-9 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                        </div>
+                        <select id="history-filter-status" onchange="renderHistoryTable()" class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">ทุกสถานะ / รายการซ่อมทั้งหมด</option>
+                            <option value="รอซ่อม">รอซ่อม (Active)</option>
+                            <option value="ปกติ">ซ่อมเสร็จปกติ (Completed)</option>
+                            <option value="ชำรุด">ชำรุด / จำหน่าย (Broken)</option>
+                        </select>
+                        <select id="history-filter-month" onchange="renderHistoryTable()" class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">ทุกเดือน</option>
+                            <option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option>
+                            <option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option>
+                            <option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option>
+                            <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+                        </select>
+                        <select id="history-filter-year" onchange="renderHistoryTable()" class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">ทุกปี พ.ศ.</option>
+                            <option value="2569">2569</option>
+                            <option value="2568">2568</option>
+                            <option value="2567">2567</option>
+                            <option value="2566">2566</option>
+                        </select>
+                    </div>
+                    <button onclick="printOfficialReport()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium transition shadow-sm whitespace-nowrap">
+                        <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์รายงานราชการ A4
+                    </button>
+                </div>
+
+                <!-- Web Table View -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
+                    <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> ประวัติและรายงานการซ่อมบำรุงพัสดุ
+                        </h2>
+                        <span id="history-count-badge" class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold">0 รายการ</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">รหัสการซ่อม</th>
                                     <th class="p-4">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
@@ -194,9 +272,51 @@
                                 </tr>
                             </thead>
                             <tbody id="history-table-body" class="divide-y divide-slate-100">
-                                <!-- Data rendered dynamically -->
+                                <!-- Rendered dynamically -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Printable Official A4 Report Section -->
+                <div id="printable-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
+                    <!-- Report Header -->
+                    <div class="text-center space-y-1 mb-6">
+                        <div class="font-bold text-xl">รายงานสรุปผลการซ่อมบำรุงครุภัณฑ์และพัสดุอุปกรณ์</div>
+                        <div class="text-sm">โรงเรียนคงคาราม อำเภอเมือง จังหวัดราชบุรี</div>
+                        <div id="report-date-range-label" class="text-xs text-slate-600 mt-1">ประจำปีงบประมาณ พ.ศ. 2569</div>
+                    </div>
+
+                    <div class="flex justify-between text-xs mb-4 pb-2 border-b border-slate-300">
+                        <div>ผู้จัดทำรายงาน: <strong>ครูศรันย์กรณ์ อาจณรงค์กร (ครูผู้รับผิดชอบระบบพัสดุ)</strong></div>
+                        <div id="report-printed-timestamp">วันที่พิมพ์: 7 พฤศจิกายน 2569</div>
+                    </div>
+
+                    <!-- Report Table -->
+                    <table class="w-full text-left text-xs border-collapse border border-slate-400 mb-8">
+                        <thead>
+                            <tr class="bg-slate-200 text-slate-900 font-bold">
+                                <th class="border border-slate-400 p-2 text-center w-12">ที่</th>
+                                <th class="border border-slate-400 p-2 w-28">รหัสซ่อม / วันที่</th>
+                                <th class="border border-slate-400 p-2 w-32">เลขครุภัณฑ์</th>
+                                <th class="border border-slate-400 p-2">ชื่อพัสดุ / อาการที่พบ</th>
+                                <th class="border border-slate-400 p-2">ผลการซ่อม / การแก้ไข</th>
+                                <th class="border border-slate-400 p-2 w-20 text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="official-report-tbody">
+                            <!-- Rendered for print -->
+                        </tbody>
+                    </table>
+
+                    <!-- Signature Block -->
+                    <div class="flex justify-between mt-12 text-sm page-break">
+                        <div class="text-center space-y-16 w-64">
+                            <div>ลงชื่อ......................................................ผู้รายงาน<br>(นายศรันย์กรณ์ อาจณรงค์กร)<br>ครูผู้รับผิดชอบงานพัสดุ</div>
+                        </div>
+                        <div class="text-center space-y-16 w-64">
+                            <div>ลงชื่อ......................................................ผู้ตรวจสอบ<br>(......................................................)<br>ผู้อำนวยการโรงเรียนคงคาราม</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -240,11 +360,60 @@
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
                     <div>
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
-                            <i data-lucide="database" class="w-5 h-5 text-indigo-600"></i> การเชื่อมโยง Google Sheets & สำรองข้อมูล
+                            <i data-lucide="database" class="w-5 h-5 text-indigo-600"></i> การบริหารจัดการฐานข้อมูล & สำรองข้อมูล
                         </h2>
-                        <p class="text-sm text-slate-500">ระบบเชื่อมต่อโดยตรงกับ Google Sheets ดึงข้อมูลสดผ่าน Sheet ID ที่กำหนด</p>
+                        <p class="text-sm text-slate-500">จัดการสำรองข้อมูล, กู้คืน, ล้างฐานข้อมูล และนำเข้าไฟล์ CSV</p>
                     </div>
-                    <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+                    <!-- Management Actions Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Backup -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="download-cloud" class="w-4 h-4 text-emerald-600"></i> Backup ฐานข้อมูล (JSON)</h3>
+                                <p class="text-xs text-slate-500 mt-1">ดาวน์โหลดข้อมูลทั้งหมดในระบบเก็บไว้เป็นไฟล์สำรอง (.json)</p>
+                            </div>
+                            <button onclick="backupDatabase()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full">ดาวน์โหลด Backup ข้อมูล</button>
+                        </div>
+
+                        <!-- Restore -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="upload-cloud" class="w-4 h-4 text-indigo-600"></i> Restore ฐานข้อมูล</h3>
+                                <p class="text-xs text-slate-500 mt-1">กู้คืนข้อมูลเข้าระบบผ่านไฟล์สำรอง JSON ที่เคยดาวน์โหลดไว้</p>
+                            </div>
+                            <label class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full text-center cursor-pointer">
+                                เลือกไฟล์ Restore (.json) <input type="file" accept=".json" onchange="restoreDatabase(event)" class="hidden">
+                            </label>
+                        </div>
+
+                        <!-- Delete / Clear DB -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i> Delete ฐานข้อมูล (ล้างข้อมูล)</h3>
+                                <p class="text-xs text-slate-500 mt-1">ล้างข้อมูลพัสดุและประวัติทั้งหมดในระบบ (ต้องใช้รหัส PIN)</p>
+                            </div>
+                            <button onclick="promptClearDatabase()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full">ล้างฐานข้อมูลทั้งหมด</button>
+                        </div>
+
+                        <!-- Import CSV & Template -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="file-spreadsheet" class="w-4 h-4 text-amber-600"></i> นำเข้าข้อมูล (CSV / Excel)</h3>
+                                <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%93%E0%B8%94%E0%B9%89,%E0%B8%8A%E0%BB%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8,%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%83%E0%B8%A8,%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AB%E0%B9%89%E0%B8%AD%2F%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%0A7440-001%2F66,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B8%9E%E0%B8%B4%E0%B8%A7%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%E0%B9%8C%2F%E0%B9%80%E0%B8%9F%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99%E0%B8%B4%E0%B9%80%E0%B8%88%E0%B8%AD%E0%B8%A3%E0%B9%8C,Acer%20C24" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดตัวอย่าง CSV
+                                </a>
+                                <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
+                                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> นำเข้า CSV <input type="file" accept=".csv" onchange="importCSVData(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100 flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
                         <div>
                             <div class="text-sm font-bold text-indigo-900">Google Sheet ID ปัจจุบัน:</div>
                             <div id="display-sheet-id" class="text-xs font-mono text-indigo-700 bg-white px-2 py-1 rounded border border-indigo-200 mt-1"></div>
@@ -260,6 +429,51 @@
     </div>
 
     <!-- Modals -->
+    <!-- Complete Repair Modal -->
+    <div id="complete-repair-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 bg-emerald-600 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> บันทึกผลการซ่อมบำรุง
+                </h3>
+                <button onclick="closeCompleteRepairModal()" class="text-white hover:bg-emerald-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="complete-repair-form" onsubmit="handleCompleteRepairSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="comp-repair-id" value="">
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1">
+                    <div><strong>รหัสการซ่อม:</strong> <span id="comp-disp-repair-id" class="font-mono text-indigo-600 font-bold"></span></div>
+                    <div><strong>พัสดุ:</strong> <span id="comp-disp-asset-info" class="text-slate-800"></span></div>
+                    <div><strong>อาการที่แจ้ง:</strong> <span id="comp-disp-issue" class="text-amber-700"></span></div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">สาเหตุของปัญหา *</label>
+                    <input type="text" id="comp-cause" required placeholder="ระบุสาเหตุข้อขัดข้อง..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">การแก้ไข / เปลี่ยนอะไหล่ *</label>
+                    <textarea id="comp-solution" required rows="2" placeholder="ระบุรายละเอียดการแก้ไข อะไหล่ที่เปลี่ยน..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">วันที่ซ่อมเสร็จ *</label>
+                        <input type="date" id="comp-finish-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ผลการซ่อม (สถานะพัสดุ) *</label>
+                        <select id="comp-status" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="ปกติ">ปกติ (ใช้งานได้ตามเดิม)</option>
+                            <option value="ชำรุด">ชำรุด (ซ่อมไม่ได้ / จำหน่ายออก)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeCompleteRepairModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-sm">บันทึกผลและส่งไปประวัติซ่อม</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Inventory Modal -->
     <div id="inventory-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden my-8">
@@ -380,12 +594,10 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Google Sheet ID</label>
                     <input type="text" id="config-sheet-id-input" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <p class="text-xs text-slate-500 mt-1">ID ของไฟล์ Google Sheet ที่ดึงข้อมูล CSV</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Google Apps Script Web App API URL</label>
                     <input type="url" id="config-script-url-input" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <p class="text-xs text-slate-500 mt-1">URL Web App จากการ Deploy เพื่อซิงค์ข้อมูลถาวร</p>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeConfigModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium">ยกเลิก</button>
@@ -405,7 +617,6 @@
         let repairData = [];
         let futureData = [];
 
-        // Check authentication on load
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             document.getElementById('display-sheet-id').innerText = sheetId;
@@ -445,7 +656,6 @@
             fetchGoogleSheetsData();
         }
 
-        // CSV Parser utility
         function parseCSV(text) {
             let lines = text.split("\n");
             let result = [];
@@ -475,7 +685,6 @@
         async function fetchGoogleSheetsData() {
             document.getElementById('loading-indicator').classList.remove('hidden');
             try {
-                // Fetch school_inventory_v2 directly from Google Sheet CSV Export
                 const invUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=school_inventory_v2`;
                 const invRes = await fetch(invUrl);
                 const invText = await invRes.text();
@@ -502,7 +711,6 @@
                     }
                 }
 
-                // Fetch repair_history
                 try {
                     const repUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=repair_history`;
                     const repRes = await fetch(repUrl);
@@ -523,14 +731,13 @@
                                     cause: r[6] || '',
                                     solution: r[7] || '',
                                     finishDate: r[8] || '',
-                                    status: r[9] || 'ปกติ'
+                                    status: r[9] || 'รอซ่อม'
                                 });
                             }
                         }
                     }
                 } catch(e) { console.log("Repair history sheet error or empty"); }
 
-                // Fetch future_inventory
                 try {
                     const futUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=future_inventory`;
                     const futRes = await fetch(futUrl);
@@ -555,11 +762,12 @@
 
                 renderInventoryTable();
                 renderRepairDropdown();
+                renderActiveRepairTable();
                 renderHistoryTable();
                 renderFutureTable();
             } catch (err) {
                 console.error("Error fetching Google Sheets:", err);
-                alert("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้ กรุณาตรวจสอบว่าไฟล์ Google Sheet ตั้งค่าการแชร์เป็น 'ทุกคนที่มีลิงก์ (Anyone with the link)' หรือไม่");
+                alert("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้ กรุณาตรวจสอบสิทธิ์การแชร์");
             } finally {
                 document.getElementById('loading-indicator').classList.add('hidden');
             }
@@ -581,20 +789,111 @@
             }
         }
 
-        // Tab Navigation
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-indigo-600', 'text-indigo-600');
-                el.classList.add('border-transparent', 'text-slate-600');
-            });
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-btn-${tabName}`).classList.add('border-indigo-600', 'text-indigo-600');
-            document.getElementById(`tab-btn-${tabName}`).classList.remove('border-transparent', 'text-slate-600');
-            lucide.createIcons();
+        // --- Database Management Functions ---
+        function backupDatabase() {
+            if (!confirm("คุณต้องการดาวน์โหลดไฟล์สำรองข้อมูล (Backup JSON) ใช่หรือไม่?")) return;
+            const backupData = {
+                exportDate: new Date().toISOString(),
+                inventory: inventoryData,
+                repairHistory: repairData,
+                future: futureData
+            };
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SchoolAsset_Backup_${new Date().toISOString().substring(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert("สำรองข้อมูล (Backup) สำเร็จเรียบร้อยแล้ว!");
         }
 
-        // Render Inventory Table
+        function restoreDatabase(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!confirm("การ Restore จะแทนที่ข้อมูลปัจจุบันด้วยข้อมูลจากไฟล์สำรอง คุณต้องการดำเนินการต่อหรือไม่?")) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.inventory) inventoryData = data.inventory;
+                    if (data.repairHistory) repairData = data.repairHistory;
+                    if (data.future) futureData = data.future;
+
+                    renderInventoryTable();
+                    renderRepairDropdown();
+                    renderActiveRepairTable();
+                    renderHistoryTable();
+                    renderFutureTable();
+                    alert("กู้คืนข้อมูล (Restore) สำเร็จเรียบร้อยแล้ว!");
+                } catch (err) {
+                    alert("ไฟล์สำรองข้อมูลไม่ถูกต้องหรือเสียหาย");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function promptClearDatabase() {
+            const pin = prompt("กรุณากรอกรหัส PIN ผู้ดูแลระบบเพื่อยืนยันการล้างฐานข้อมูลทั้งหมด:");
+            if (pin !== '11052524' && pin !== adminPassword) {
+                alert("รหัส PIN ไม่ถูกต้อง!");
+                return;
+            }
+            if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบออกจากระบบและ Google Sheets คุณแน่ใจหรือไม่?")) {
+                clearDatabaseExecution();
+            }
+        }
+
+        async function clearDatabaseExecution() {
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            inventoryData = [];
+            repairData = [];
+            futureData = [];
+            renderInventoryTable();
+            renderActiveRepairTable();
+            renderHistoryTable();
+            renderFutureTable();
+            await postToGoogleSheets('clearDatabase', {});
+            document.getElementById('loading-indicator').classList.add('hidden');
+            alert("ล้างฐานข้อมูลทั้งหมดเรียบร้อยแล้ว!");
+        }
+
+        function importCSVData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const text = event.target.result;
+                const rows = parseCSV(text);
+                let count = 0;
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (r.length >= 2 && r[0]) {
+                        const newItem = {
+                            assetNumber: r[0] || '',
+                            assetName: r[1] || '',
+                            category: r[2] || 'คอมพิวเตอร์/อิเล็กทรอนิกส์',
+                            brandModel: r[3] || '',
+                            registrationYear: r[4] || '',
+                            specifications: r[5] || '',
+                            department: r[6] || '',
+                            teacherInCharge: r[7] || '',
+                            location: r[8] || '',
+                            imageUrl: r[9] || ''
+                        };
+                        inventoryData.unshift(newItem);
+                        await postToGoogleSheets('saveInventory', newItem);
+                        count++;
+                    }
+                }
+                renderInventoryTable();
+                renderRepairDropdown();
+                alert(`นำเข้าข้อมูลสำเร็จ ${count} รายการเรียบร้อยแล้ว!`);
+            };
+            reader.readAsText(file);
+        }
+
         function renderInventoryTable() {
             const tbody = document.getElementById('inventory-table-body');
             const search = document.getElementById('search-input').value.toLowerCase();
@@ -607,7 +906,7 @@
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบรายการพัสดุใน Google Sheet นี้</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบรายการพัสดุ</td></tr>`;
                 return;
             }
 
@@ -637,11 +936,8 @@
             lucide.createIcons();
         }
 
-        function filterInventory() {
-            renderInventoryTable();
-        }
+        function filterInventory() { renderInventoryTable(); }
 
-        // Inventory Modals & CRUD
         function openInventoryModal(editIdx = null) {
             document.getElementById('inventory-modal').classList.remove('hidden');
             if (editIdx !== null) {
@@ -665,9 +961,7 @@
             }
         }
 
-        function closeInventoryModal() {
-            document.getElementById('inventory-modal').classList.add('hidden');
-        }
+        function closeInventoryModal() { document.getElementById('inventory-modal').classList.add('hidden'); }
 
         async function handleInventorySubmit(e) {
             e.preventDefault();
@@ -684,46 +978,54 @@
                 location: document.getElementById('inv-location').value,
                 imageUrl: document.getElementById('inv-imageUrl').value
             };
-
-            if (editIdx !== '') {
-                inventoryData[editIdx] = newItem;
-            } else {
-                inventoryData.unshift(newItem);
-            }
+            if (editIdx !== '') { inventoryData[editIdx] = newItem; } else { inventoryData.unshift(newItem); }
             renderInventoryTable();
             closeInventoryModal();
-
-            // Sync to Google Sheets API
             await postToGoogleSheets('saveInventory', newItem);
-            alert("บันทึกข้อมูลและซิงค์ลง Google Sheets เรียบร้อยแล้ว!");
+            alert("บันทึกข้อมูลพัสดุสำเร็จเรียบร้อย!");
         }
 
-        function editInventory(idx) {
-            openInventoryModal(idx);
-        }
+        function editInventory(idx) { openInventoryModal(idx); }
 
         async function deleteInventory(idx) {
             if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
-                const target = inventoryData[idx];
+                const deletedItem = inventoryData[idx];
                 inventoryData.splice(idx, 1);
                 renderInventoryTable();
-                await postToGoogleSheets('deleteInventory', { assetNumber: target.assetNumber });
-                alert("ลบข้อมูลและอัปเดต Google Sheets เรียบร้อยแล้ว!");
+                await postToGoogleSheets('deleteInventory', deletedItem);
+                alert("ลบรายการพัสดุเรียบร้อยแล้ว");
             }
         }
 
-        // Repair Tab
-        function renderRepairDropdown() {
+        function filterRepairAssetOptions() {
+            const search = document.getElementById('repair-search-input').value.toLowerCase().trim();
             const select = document.getElementById('repair-asset-select');
-            select.innerHTML = `<option value="">-- กรุณาเลือกพัสดุ --</option>` + inventoryData.map((item, idx) => `
-                <option value="${idx}">${item.assetNumber} - ${item.assetName}</option>
-            `).join('');
+            const filtered = inventoryData.filter(item => 
+                (item.assetNumber || '').toLowerCase().includes(search) || 
+                (item.assetName || '').toLowerCase().includes(search) ||
+                (item.brandModel || '').toLowerCase().includes(search)
+            );
+            select.innerHTML = `<option value="">-- กรุณาเลือกพัสดุ --</option>` + filtered.map(item => {
+                const originalIdx = inventoryData.indexOf(item);
+                return `<option value="${originalIdx}">${item.assetNumber} - ${item.assetName} (${item.brandModel || '-'})</option>`;
+            }).join('');
+            document.getElementById('repair-search-count').innerText = search ? `พบพัสดุที่ตรงกัน ${filtered.length} รายการ` : '';
+            onRepairAssetSelected();
+        }
+
+        function clearRepairAssetSearch() {
+            document.getElementById('repair-search-input').value = '';
+            filterRepairAssetOptions();
+        }
+
+        function renderRepairDropdown() {
+            filterRepairAssetOptions();
             document.getElementById('repair-date').value = new Date().toISOString().substring(0, 10);
         }
 
         function onRepairAssetSelected() {
             const idx = document.getElementById('repair-asset-select').value;
-            if (idx !== '') {
+            if (idx !== '' && inventoryData[idx]) {
                 const item = inventoryData[idx];
                 document.getElementById('repair-asset-number').value = item.assetNumber;
                 document.getElementById('repair-asset-name').value = item.assetName;
@@ -748,21 +1050,147 @@
                 status: 'รอซ่อม'
             };
             repairData.unshift(newRepair);
-            renderHistoryTable();
+            renderActiveRepairTable();
             await postToGoogleSheets('saveRepair', newRepair);
-            alert("บันทึกแจ้งซ่อมและซิงค์ลง Google Sheets เรียบร้อยแล้ว!");
+            alert("บันทึกแจ้งซ่อมเรียบร้อยแล้ว!");
             e.target.reset();
             document.getElementById('repair-date').value = new Date().toISOString().substring(0, 10);
+            clearRepairAssetSearch();
+        }
+
+        function renderActiveRepairTable() {
+            const tbody = document.getElementById('repair-active-table-body');
+            const activeRepairs = repairData.filter(item => item.status === 'รอซ่อม' || item.finishDate === '-');
+            if (activeRepairs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">ไม่มีรายการพัสดุที่อยู่ระหว่างรอซ่อม</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = activeRepairs.map(item => {
+                const globalIndex = repairData.indexOf(item);
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3.5 font-mono font-bold text-amber-600">${item.repairId}</td>
+                        <td class="p-3.5">
+                            <div class="font-bold text-slate-800">${item.assetName}</div>
+                            <div class="text-xs font-mono text-slate-500">${item.assetNumber}</div>
+                        </td>
+                        <td class="p-3.5 text-xs text-slate-700 max-w-xs">${item.issue}</td>
+                        <td class="p-3.5 text-xs text-slate-600">
+                            <div>${item.dateFound}</div>
+                            <div class="text-slate-400">ผู้แจ้ง: ${item.receiver}</div>
+                        </td>
+                        <td class="p-3.5">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 flex items-center gap-1 w-fit">
+                                <i data-lucide="clock" class="w-3 h-3"></i> ${item.status || 'รอซ่อม'}
+                            </span>
+                        </td>
+                        <td class="p-3.5 text-right">
+                            <button onclick="openCompleteRepairModal(${globalIndex})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center gap-1 ml-auto">
+                                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> บันทึกผลการซ่อม
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openCompleteRepairModal(idx) {
+            const item = repairData[idx];
+            if (!item) return;
+            document.getElementById('comp-repair-id').value = idx;
+            document.getElementById('comp-disp-repair-id').innerText = item.repairId;
+            document.getElementById('comp-disp-asset-info').innerText = `${item.assetNumber} - ${item.assetName}`;
+            document.getElementById('comp-disp-issue').innerText = item.issue;
+            document.getElementById('comp-finish-date').value = new Date().toISOString().substring(0, 10);
+            document.getElementById('comp-cause').value = '';
+            document.getElementById('comp-solution').value = '';
+            document.getElementById('comp-status').value = 'ปกติ';
+            document.getElementById('complete-repair-modal').classList.remove('hidden');
+        }
+
+        function closeCompleteRepairModal() { document.getElementById('complete-repair-modal').classList.add('hidden'); }
+
+        async function handleCompleteRepairSubmit(e) {
+            e.preventDefault();
+            const idx = document.getElementById('comp-repair-id').value;
+            if (idx === '' || !repairData[idx]) return;
+
+            const cause = document.getElementById('comp-cause').value;
+            const solution = document.getElementById('comp-solution').value;
+            const finishDate = document.getElementById('comp-finish-date').value;
+            const status = document.getElementById('comp-status').value;
+
+            repairData[idx].cause = cause;
+            repairData[idx].solution = solution;
+            repairData[idx].finishDate = finishDate;
+            repairData[idx].status = status;
+
+            renderActiveRepairTable();
+            renderHistoryTable();
+            closeCompleteRepairModal();
+
+            await postToGoogleSheets('completeRepair', {
+                repairId: repairData[idx].repairId,
+                cause: cause,
+                solution: solution,
+                finishDate: finishDate,
+                status: status
+            });
+
+            alert("บันทึกผลการซ่อมเรียบร้อยแล้ว!");
             switchTab('history');
+        }
+
+        // --- Filtered History & Report Render Engine ---
+        function getFilteredHistory() {
+            const search = (document.getElementById('history-search')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('history-filter-status')?.value || '';
+            const monthFilter = document.getElementById('history-filter-month')?.value || '';
+            const yearFilter = document.getElementById('history-filter-year')?.value || '';
+
+            return repairData.filter(item => {
+                const matchSearch = (item.repairId + ' ' + item.assetNumber + ' ' + item.assetName + ' ' + item.issue + ' ' + item.receiver).toLowerCase().includes(search);
+                
+                let matchStatus = true;
+                if (statusFilter === 'รอซ่อม') {
+                    matchStatus = (item.status === 'รอซ่อม' || item.finishDate === '-');
+                } else if (statusFilter === 'ปกติ') {
+                    matchStatus = (item.status === 'ปกติ');
+                } else if (statusFilter === 'ชำรุด') {
+                    matchStatus = (item.status === 'ชำรุด');
+                }
+
+                let matchMonth = true;
+                let matchYear = true;
+                const checkDate = item.finishDate !== '-' ? item.finishDate : item.dateFound;
+                if (checkDate && checkDate.includes('-')) {
+                    const parts = checkDate.split('-');
+                    const y = parts[0];
+                    const m = parts[1];
+                    if (monthFilter && m !== monthFilter) matchMonth = false;
+                    if (yearFilter && y !== yearFilter) matchYear = false;
+                } else if ((monthFilter || yearFilter) && (!checkDate || checkDate === '-')) {
+                    matchMonth = false;
+                    matchYear = false;
+                }
+
+                return matchSearch && matchStatus && matchMonth && matchYear;
+            });
         }
 
         function renderHistoryTable() {
             const tbody = document.getElementById('history-table-body');
-            if (repairData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีประวัติการแจ้งซ่อม</td></tr>`;
+            const filtered = getFilteredHistory();
+            
+            document.getElementById('history-count-badge').innerText = `${filtered.length} รายการ`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบข้อมูลประวัติการซ่อมตามเงื่อนไขที่สืบค้น</td></tr>`;
                 return;
             }
-            tbody.innerHTML = repairData.map(item => `
+
+            tbody.innerHTML = filtered.map(item => `
                 <tr class="hover:bg-slate-50 transition">
                     <td class="p-4 font-mono font-medium text-indigo-600">${item.repairId}</td>
                     <td class="p-4">
@@ -771,18 +1199,51 @@
                     </td>
                     <td class="p-4 text-xs text-slate-700">${item.issue}</td>
                     <td class="p-4 text-xs text-slate-600">
-                        <div>${item.dateFound}</div>
+                        <div>แจ้ง: ${item.dateFound}</div>
                         <div class="text-slate-400">ผู้แจ้ง: ${item.receiver}</div>
                     </td>
                     <td class="p-4 text-xs text-slate-600">
-                        <div><strong>สาเหตุ:</strong> ${item.cause}</div>
-                        <div><strong>แก้ไข:</strong> ${item.solution}</div>
+                        <div><strong>สาเหตุ:</strong> ${item.cause || '-'}</div>
+                        <div><strong>การแก้ไข:</strong> ${item.solution || '-'}</div>
+                        <div class="text-emerald-600 text-[11px]">เสร็จเมื่อ: ${item.finishDate}</div>
                     </td>
                     <td class="p-4">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'ปกติ' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}">${item.status}</span>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'ปกติ' ? 'bg-green-50 text-green-700' : item.status === 'ชำรุด' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}">${item.status || 'รอซ่อม'}</span>
                     </td>
                 </tr>
             `).join('');
+
+            // Also prepare printable report tbody
+            const printTbody = document.getElementById('official-report-tbody');
+            printTbody.innerHTML = filtered.map((item, idx) => `
+                <tr>
+                    <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
+                    <td class="border border-slate-400 p-2 font-mono text-[11px]"><strong>${item.repairId}</strong><br>${item.dateFound}</td>
+                    <td class="border border-slate-400 p-2 font-mono text-[11px]">${item.assetNumber}</td>
+                    <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">อาการ: ${item.issue}</span></td>
+                    <td class="border border-slate-400 p-2"><span class="text-slate-700">สาเหตุ: ${item.cause || '-'}</span><br><span class="text-emerald-800">วิธีแก้: ${item.solution || '-'}</span></td>
+                    <td class="border border-slate-400 p-2 text-center font-bold">${item.status || 'รอซ่อม'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function printOfficialReport() {
+            const monthVal = document.getElementById('history-filter-month').value;
+            const yearVal = document.getElementById('history-filter-year').value;
+            const monthsName = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            
+            let label = "รายงานสรุปประวัติการซ่อมบำรุงพัสดุ";
+            if (monthVal && yearVal) {
+                label = `ประจำเดือน ${monthsName[parseInt(monthVal)]} พ.ศ. ${yearVal}`;
+            } else if (yearVal) {
+                label = `ประจำปี พ.ศ. ${yearVal}`;
+            }
+            document.getElementById('report-date-range-label').innerText = label;
+
+            const now = new Date();
+            document.getElementById('report-printed-timestamp').innerText = `พิมพ์เมื่อวันที่ ${now.getDate()} ${monthsName[now.getMonth() + 1]} พ.ศ. ${now.getFullYear() + 543}`;
+
+            window.print();
         }
 
         // Future Tab
@@ -825,9 +1286,7 @@
             }
         }
 
-        function closeFutureModal() {
-            document.getElementById('future-modal').classList.add('hidden');
-        }
+        function closeFutureModal() { document.getElementById('future-modal').classList.add('hidden'); }
 
         async function handleFutureSubmit(e) {
             e.preventDefault();
@@ -839,20 +1298,14 @@
                 quantity: document.getElementById('fut-quantity').value,
                 dataLink: document.getElementById('fut-dataLink').value
             };
-            if (editIdx !== '') {
-                futureData[editIdx] = newItem;
-            } else {
-                futureData.push(newItem);
-            }
+            if (editIdx !== '') { futureData[editIdx] = newItem; } else { futureData.push(newItem); }
             renderFutureTable();
             closeFutureModal();
             await postToGoogleSheets('saveFuture', newItem);
             alert("บันทึกแผนพัสดุปีหน้าเรียบร้อยแล้ว!");
         }
 
-        function editFuture(idx) {
-            openFutureModal(idx);
-        }
+        function editFuture(idx) { openFutureModal(idx); }
 
         async function deleteFuture(idx) {
             if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
@@ -863,16 +1316,8 @@
             }
         }
 
-        // Config Modal Functions
-        function openConfigModal() {
-            document.getElementById('config-sheet-id-input').value = sheetId;
-            document.getElementById('config-script-url-input').value = scriptUrl;
-            document.getElementById('config-modal').classList.remove('hidden');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('config-modal').classList.add('hidden');
-        }
+        function openConfigModal() { document.getElementById('config-modal').classList.remove('hidden'); }
+        function closeConfigModal() { document.getElementById('config-modal').classList.add('hidden'); }
 
         function saveConfigSheetId() {
             const newId = document.getElementById('config-sheet-id-input').value.trim();
@@ -885,9 +1330,9 @@
                 document.getElementById('display-sheet-id').innerText = sheetId;
                 closeConfigModal();
                 fetchGoogleSheetsData();
-                alert("บันทึกการตั้งค่า Google Sheet ID และ Script Web App URL เรียบร้อยแล้ว!");
+                alert("บันทึกการตั้งค่าเรียบร้อยแล้ว!");
             } else {
-                alert("กรุณากรอก Google Sheet ID ให้ถูกต้อง");
+                alert("กรุณากรอก Sheet ID ให้ถูกต้อง");
             }
         }
     </script>
