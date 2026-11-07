@@ -26,6 +26,7 @@
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
 
         let inventoryData = [];
+        let borrowData = [];
         let repairData = [];
         let futureData = [];
 
@@ -94,6 +95,9 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 sm:space-x-4 overflow-x-auto border-t border-slate-100">
                 <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-2 whitespace-nowrap">
                     <i data-lucide="box" class="w-4 h-4"></i> ทะเบียนพัสดุ
+                </button>
+                <button onclick="switchTab('borrow')" id="tab-btn-borrow" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="repeat" class="w-4 h-4"></i> ยืม-คืน พัสดุ
                 </button>
                 <button onclick="switchTab('disposal')" id="tab-btn-disposal" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap">
                     <i data-lucide="archive" class="w-4 h-4"></i> จำหน่ายพัสดุ
@@ -198,11 +202,17 @@
                         <tbody id="inventory-report-tbody"></tbody>
                     </table>
                     <div class="flex justify-between mt-12 text-sm page-break">
-                        <div class="text-center space-y-16 w-64">
-                            <div>ลงชื่อ......................................................ผู้รายงาน<br>(นายศรันย์กรณ์ อาจณรงค์กร)<br>ครูผู้รับผิดชอบงานพัสดุ</div>
+                        <div class="text-center space-y-1 w-64">
+                            <div>ลงชื่อ......................................................</div>
+                            <div class="text-xs text-slate-600">ผู้รายงาน</div>
+                            <div class="text-xs font-bold mt-1">(นายศรันย์กรณ์ อาจณรงค์กร)</div>
+                            <div class="text-xs text-slate-600">ครูผู้รับผิดชอบงานพัสดุ</div>
                         </div>
-                        <div class="text-center space-y-16 w-64">
-                            <div>ลงชื่อ......................................................ผู้ตรวจสอบ<br>(......................................................)<br>ผู้อำนวยการโรงเรียนคงคาราม</div>
+                        <div class="text-center space-y-1 w-64">
+                            <div>ลงชื่อ......................................................</div>
+                            <div class="text-xs text-slate-600">ผู้ตรวจสอบ</div>
+                            <div class="text-xs font-bold mt-1">(......................................................)</div>
+                            <div class="text-xs text-slate-600">ผู้อำนวยการโรงเรียนคงคาราม</div>
                         </div>
                     </div>
                 </div>
@@ -243,27 +253,18 @@
                         <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                             <i data-lucide="clipboard-list" class="w-5 h-5 text-rose-600"></i> รายการพัสดุที่จำหน่ายไปแล้ว
                         </h3>
-                        <span id="disposed-count-badge" class="px-2.5 py-0.5 bg-rose-50 text-rose-700 text-xs font-bold rounded-full">0 รายการ</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="disposed-filter-search" oninput="renderDisposedTable()" placeholder="ค้นหาครุภัณฑ์จำหน่าย..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-rose-500">
-                        <button onclick="printDisposedOfficialReport()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm text-xs font-medium transition">
-                            <i data-lucide="printer" class="w-3.5 h-3.5"></i> พิมพ์รายงานจำหน่าย A4
-                        </button>
                     </div>
                 </div>
-
-                <!-- Disposed Table -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">เลขครุภัณฑ์</th>
-                                    <th class="p-4">ชื่อพัสดุ / ยี่ห้อรุ่น</th>
-                                    <th class="p-4">ประเภท</th>
-                                    <th class="p-4">หน่วยงาน / ผู้รับผิดชอบ</th>
-                                    <th class="p-4">วันที่จำหน่าย / เหตุผล</th>
+                                    <th class="p-4">ชื่อพัสดุ / รุ่น</th>
+                                    <th class="p-4">หน่วยงาน</th>
+                                    <th class="p-4">วันที่จำหน่าย</th>
+                                    <th class="p-4">เหตุผล</th>
                                     <th class="p-4 text-right">จัดการ</th>
                                 </tr>
                             </thead>
@@ -271,59 +272,169 @@
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Printable Official Disposed Report (A4) -->
-                <div id="printable-disposed-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
+            <!-- Tab: Borrow & Return (ยืม-คืน พัสดุ) -->
+            <div id="tab-borrow" class="tab-content hidden space-y-6">
+                <!-- Borrow Form -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-3xl mx-auto no-print">
+                    <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
+                        <i data-lucide="repeat" class="w-5 h-5 text-indigo-600"></i> บันทึกการยืมพัสดุ / ครุภัณฑ์
+                    </h2>
+                    <p class="text-xs text-slate-500 mb-6">กรอกข้อมูลการขอยืมพัสดุไปใช้งานนอกสถานที่หรือห้องเรียนอื่น</p>
+                    <form onsubmit="handleBorrowSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">ค้นหาและเลือกพัสดุที่ต้องการยืม *</label>
+                            <div class="relative mb-2">
+                                <input type="text" id="borrow-search-input" oninput="filterBorrowAssetOptions()" placeholder="พิมพ์เลขครุภัณฑ์ หรือ ชื่อพัสดุเพื่อกรองตัวเลือก..." class="w-full p-2.5 pl-9 border border-indigo-200 bg-indigo-50/50 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-indigo-400"></i>
+                                <button type="button" onclick="clearBorrowAssetSearch()" class="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 bg-white px-2 py-0.5 rounded border">ล้าง</button>
+                            </div>
+                            <div id="borrow-search-count" class="text-xs text-indigo-600 mb-1 font-medium"></div>
+                            <select id="borrow-asset-select" required onchange="onBorrowAssetSelected()" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">-- กรุณาเลือกพัสดุ --</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">เลขครุภัณฑ์</label>
+                                <input type="text" id="borrow-asset-number" readonly class="w-full p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-600 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อพัสดุ</label>
+                                <input type="text" id="borrow-asset-name" readonly class="w-full p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-600">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ขอยืม *</label>
+                                <input type="text" id="borrower-name" required placeholder="ชื่อ-นามสกุล ผู้ยืม" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">หน่วยงาน / ชั้นเรียน *</label>
+                                <input type="text" id="borrower-dept" required placeholder="เช่น กลุ่มสาระฯ / ม.3/1" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+                                <input type="text" id="borrower-phone" placeholder="08x-xxxxxxx" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">สถานที่นำไปใช้งาน / วัตถุประสงค์ *</label>
+                            <input type="text" id="borrow-location-used" required placeholder="ระบุห้องหรือสถานที่นำพัสดุไปใช้..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่ยืม *</label>
+                                <input type="date" id="borrow-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">กำหนดวันส่งคืน *</label>
+                                <input type="date" id="borrow-due-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                            <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm text-sm transition">บันทึกทำรายการยืม</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Borrow List Header & Table -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> รายรายละเอียดประวัติการยืม-คืนพัสดุ
+                        </h3>
+                        <span id="borrow-count-badge" class="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full">0 รายการ</span>
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <input type="text" id="borrow-filter-search" oninput="renderBorrowTable()" placeholder="ค้นหาการยืม..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500 flex-1 sm:w-48">
+                        <button onclick="printBorrowOfficialReport()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm text-xs font-medium transition whitespace-nowrap">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i> พิมพ์รายงานการยืม A4
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">รหัสยืม</th>
+                                    <th class="p-4">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
+                                    <th class="p-4">ผู้ยืม / หน่วยงาน</th>
+                                    <th class="p-4">สถานที่นำไปใช้</th>
+                                    <th class="p-4">วันที่ยืม - กำหนดคืน</th>
+                                    <th class="p-4">สถานะ</th>
+                                    <th class="p-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="borrow-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Printable Official Borrow Report (A4) -->
+                <div id="printable-borrow-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
                     <div class="text-center space-y-1 mb-6">
-                        <div class="font-bold text-xl">รายงานสรุปรายการพัสดุอุปกรณ์ที่ได้รับการจำหน่ายออกจากบัญชี</div>
+                        <div class="font-bold text-xl">รายงานสรุปการยืม-คืนพัสดุและครุภัณฑ์</div>
                         <div class="text-sm">โรงเรียนคงคาราม อำเภอเมือง จังหวัดราชบุรี</div>
-                        <div class="text-xs text-slate-600 mt-1">สรุปบัญชีจำหน่ายพัสดุชำรุด เสื่อมสภาพ หรือเลิกใช้งานตามระเบียบงานพัสดุ</div>
+                        <div class="text-xs text-slate-600 mt-1">สรุปบัญชีและประวัติการขอใช้พัสดุอุปกรณ์ภายนอกสถานที่</div>
                     </div>
                     <div class="flex justify-between text-xs mb-4 pb-2 border-b border-slate-300">
-                        <div>ผู้รับผิดชอบ: <strong>ครูศรันย์กรณ์ อาจณรงค์กร</strong></div>
-                        <div id="disposed-report-printed-timestamp">วันที่พิมพ์: -</div>
+                        <div>ผู้รับผิดชอบงานพัสดุ: <strong>ครูศรันย์กรณ์ อาจณรงค์กร</strong></div>
+                        <div id="borrow-report-printed-timestamp">วันที่พิมพ์: -</div>
                     </div>
                     <table class="w-full text-left text-xs border-collapse border border-slate-400 mb-8">
                         <thead>
                             <tr class="bg-slate-200 text-slate-900 font-bold">
-                                <th class="border border-slate-400 p-2 text-center w-10">ที่</th>
+                                <th class="border border-slate-400 p-2 text-center w-8">ที่</th>
+                                <th class="border border-slate-400 p-2 w-20">รหัสยืม</th>
                                 <th class="border border-slate-400 p-2 w-28">เลขครุภัณฑ์</th>
-                                <th class="border border-slate-400 p-2">ชื่อพัสดุ / รุ่น</th>
-                                <th class="border border-slate-400 p-2 w-24">หน่วยงาน</th>
-                                <th class="border border-slate-400 p-2 w-24 text-center">วันที่จำหน่าย</th>
-                                <th class="border border-slate-400 p-2">สาเหตุการจำหน่าย</th>
+                                <th class="border border-slate-400 p-2">รายการพัสดุ</th>
+                                <th class="border border-slate-400 p-2 w-28">ผู้ยืม / หน่วยงาน</th>
+                                <th class="border border-slate-400 p-2 w-20 text-center">วันที่ยืม</th>
+                                <th class="border border-slate-400 p-2 w-20 text-center">วันส่งคืน</th>
+                                <th class="border border-slate-400 p-2 w-16 text-center">สถานะ</th>
                             </tr>
                         </thead>
-                        <tbody id="disposed-report-tbody"></tbody>
+                        <tbody id="borrow-report-tbody"></tbody>
                     </table>
                     <div class="flex justify-between mt-12 text-sm page-break">
-                        <div class="text-center space-y-16 w-64">
-                            <div>ลงชื่อ......................................................ผู้รายงาน<br>(นายศรันย์กรณ์ อาจณรงค์กร)<br>ครูผู้รับผิดชอบงานพัสดุ</div>
+                        <div class="text-center space-y-1 w-64">
+                            <div>ลงชื่อ......................................................</div>
+                            <div class="text-xs text-slate-600">ผู้รายงาน</div>
+                            <div class="text-xs font-bold mt-1">(นายศรันย์กรณ์ อาจณรงค์กร)</div>
+                            <div class="text-xs text-slate-600">ครูผู้รับผิดชอบงานพัสดุ</div>
                         </div>
-                        <div class="text-center space-y-16 w-64">
-                            <div>ลงชื่อ......................................................ผู้ตรวจสอบ<br>(......................................................)<br>ผู้อำนวยการโรงเรียนคงคาราม</div>
+                        <div class="text-center space-y-1 w-64">
+                            <div>ลงชื่อ......................................................</div>
+                            <div class="text-xs text-slate-600">ผู้ตรวจสอบ</div>
+                            <div class="text-xs font-bold mt-1">(......................................................)</div>
+                            <div class="text-xs text-slate-600">ผู้อำนวยการโรงเรียนคงคาราม</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Repair Form -->
+            <!-- Tab: Repair -->
             <div id="tab-repair" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-2xl mx-auto">
+                <!-- Repair Form -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-3xl mx-auto no-print">
                     <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
-                        <i data-lucide="wrench" class="w-5 h-5 text-yellow-600"></i> บันทึกแจ้งซ่อมพัสดุ
+                        <i data-lucide="wrench" class="w-5 h-5 text-amber-600"></i> บันทึกแจ้งซ่อมพัสดุ / อุปกรณ์
                     </h2>
-                    <p class="text-xs text-slate-500 mb-6">บันทึกประวัติการส่งซ่อมหรือชำรุดของอุปกรณ์</p>
+                    <p class="text-xs text-slate-500 mb-6">แจ้งความประสงค์ซ่อมบำรุงพัสดุที่ชำรุดเสียหาย</p>
                     <form onsubmit="handleRepairSubmit(event)" class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">ค้นหาและเลือกพัสดุที่ต้องการแจ้งซ่อม *</label>
                             <div class="relative mb-2">
-                                <input type="text" id="repair-search-input" oninput="filterRepairAssetOptions()" placeholder="พิมพ์เลขครุภัณฑ์ หรือ ชื่อพัสดุเพื่อกรองตัวเลือก..." class="w-full p-2.5 pl-9 border border-indigo-200 bg-indigo-50/50 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-indigo-400"></i>
+                                <input type="text" id="repair-search-input" oninput="filterRepairAssetOptions()" placeholder="พิมพ์เลขครุภัณฑ์ หรือ ชื่อพัสดุเพื่อกรองตัวเลือก..." class="w-full p-2.5 pl-9 border border-amber-200 bg-amber-50/50 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-amber-400"></i>
                                 <button type="button" onclick="clearRepairAssetSearch()" class="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 bg-white px-2 py-0.5 rounded border">ล้าง</button>
                             </div>
-                            <div id="repair-search-count" class="text-xs text-indigo-600 mb-1 font-medium"></div>
-                            <select id="repair-asset-select" required onchange="onRepairAssetSelected()" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <div id="repair-search-count" class="text-xs text-amber-600 mb-1 font-medium"></div>
+                            <select id="repair-asset-select" required onchange="onRepairAssetSelected()" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                                 <option value="">-- กรุณาเลือกพัสดุ --</option>
                             </select>
                         </div>
@@ -338,45 +449,42 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">อาการที่พบ / ปัญหา *</label>
-                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการชำรุด..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">อาการที่พบ / ปัญหาที่ชำรุด *</label>
+                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการผิดปกติ..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่พบ *</label>
-                                <input type="date" id="repair-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่แจ้ง *</label>
+                                <input type="date" id="repair-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้ง *</label>
-                                <input type="text" id="repair-receiver" required placeholder="ชื่อ-นามสกุลผู้แจ้ง" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้งเรื่อง *</label>
+                                <input type="text" id="repair-receiver" required placeholder="ชื่อ-นามสกุล ผู้แจ้ง" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                             </div>
                         </div>
                         <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
-                            <button type="submit" class="px-6 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg shadow-sm text-sm transition">บันทึกแจ้งซ่อม</button>
+                            <button type="submit" class="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg shadow-sm text-sm transition">บันทึกแจ้งซ่อมพัสดุ</button>
                         </div>
                     </form>
                 </div>
 
                 <!-- Active Repair Queue Table -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-                                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i> รายการพัสดุที่อยู่ระหว่างการแจ้งซ่อม (รอการแก้ไข)
-                            </h3>
-                            <p class="text-xs text-slate-500">คลิกที่ปุ่ม "บันทึกผลการซ่อม" เพื่ออัปเดตสถานะเมื่อซ่อมบำรุงเสร็จสิ้น</p>
-                        </div>
-                    </div>
+                <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i> รายการพัสดุที่อยู่ระหว่างรอซ่อมบำรุง
+                    </h3>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200 text-xs">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                                 <tr>
-                                    <th class="p-3.5">รหัสซ่อม</th>
-                                    <th class="p-3.5">เลขครุภัณฑ์ / พัสดุ</th>
-                                    <th class="p-3.5">อาการที่พบ</th>
-                                    <th class="p-3.5">วันที่แจ้ง / ผู้แจ้ง</th>
-                                    <th class="p-3.5">สถานะ</th>
-                                    <th class="p-3.5 text-right">จัดการ</th>
+                                    <th class="p-4">รหัสซ่อม</th>
+                                    <th class="p-4">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
+                                    <th class="p-4">อาการที่พบ</th>
+                                    <th class="p-4">วันที่แจ้ง / ผู้แจ้ง</th>
+                                    <th class="p-4">สถานะ</th>
+                                    <th class="p-4 text-right">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="repair-active-table-body" class="divide-y divide-slate-100"></tbody>
@@ -487,11 +595,17 @@
                         <tbody id="official-report-tbody"></tbody>
                     </table>
                     <div class="flex justify-between mt-12 text-sm page-break">
-                        <div class="text-center space-y-16 w-64">
-                            <div>ลงชื่อ......................................................ผู้รายงาน<br>(นายศรันย์กรณ์ อาจณรงค์กร)<br>ครูผู้รับผิดชอบงานพัสดุ</div>
+                        <div class="text-center space-y-1 w-64">
+                            <div>ลงชื่อ......................................................</div>
+                            <div class="text-xs text-slate-600">ผู้รายงาน</div>
+                            <div class="text-xs font-bold mt-1">(นายศรันย์กรณ์ อาจณรงค์กร)</div>
+                            <div class="text-xs text-slate-600">ครูผู้รับผิดชอบงานพัสดุ</div>
                         </div>
-                        <div class="text-center space-y-16 w-64">
-                            <div>ลงชื่อ......................................................ผู้ตรวจสอบ<br>(......................................................)<br>ผู้อำนวยการโรงเรียนคงคาราม</div>
+                        <div class="text-center space-y-1 w-64">
+                            <div>ลงชื่อ......................................................</div>
+                            <div class="text-xs text-slate-600">ผู้ตรวจสอบ</div>
+                            <div class="text-xs font-bold mt-1">(......................................................)</div>
+                            <div class="text-xs text-slate-600">ผู้อำนวยการโรงเรียนคงคาราม</div>
                         </div>
                     </div>
                 </div>
@@ -572,7 +686,7 @@
                                 <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ (โครงสร้าง 10 คอลัมน์ตรงตามฟอร์ม)</p>
                             </div>
                             <div class="flex gap-2">
-                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%E0%B8%94%E0%B9%89,%E0%B8%8A%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%AA%E0%B8%94%E0%B8%B8,%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B5%E0%B9%80%E0%B8%A8,%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AB%E0%B9%89%E0%B8%AD%2F%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%81,%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%80%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B3%E0%B8%93%E0%B8%A5%E0%B8%B0%E0%B8%A8%E0%B8%99%E0%B8%B0%E0%B9%80%E0%B8%88%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B1%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%AD%E0%B8%B9%E0%B9%89%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B8%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9E%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%AD%E0%B8%9A%0A7440-001%2F66,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%2F%E0%B9%80%E0%B8%9F%E0%B8%AD%E0%B8%A3%E0%B8%AC%E0%B8%99%E0%B8%B4%E0%B9%80%E0%B8%88%E0%B8%AD%E0%B8%A3%E0%B8%AC,Acer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%82%E0%B8%A5%E0%B8%81%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%E0%B8%94%E0%B9%89,%E0%B8%8A%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%AA%E0%B8%94%E0%B8%B8,%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B5%E0%B9%80%E0%B8%A8,%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AB%E0%B9%89%E0%B8%AD%2F%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%81,%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%80%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B3%E0%B8%93%E0%B8%A5%E0%B8%B0%E0%B8%A8%E0%B8%99%E0%B8%B0%E0%B9%80%E0%B8%88%E0%B8%99%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B1%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%AD%E0%B8%B9%E0%B9%89%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B8%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9E%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%AD%E0%B8%9A%0A7440-001%2F66,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B5%80%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B9%88%E0%B8%81%E0%B8%97%E0%B8%A3%E0%B8%AD%E0%B8%93%E0%B8%B4%E0%B8%81%E0%B8%AA%E0%B9%8C,Acer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดตัวอย่าง CSV
                                 </a>
                                 <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
@@ -597,33 +711,33 @@
         </main>
     </div>
 
-    <!-- Modals -->
-    <!-- Dispose Confirmation Modal -->
-    <div id="confirm-disposal-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- Return Borrow Modal -->
+    <div id="return-borrow-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="px-6 py-4 bg-rose-600 text-white flex justify-between items-center">
+            <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
                 <h3 class="font-bold text-lg flex items-center gap-2">
-                    <i data-lucide="archive" class="w-5 h-5"></i> บันทึกจำหน่ายพัสดุออก
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> บันทึกการรับคืนพัสดุ
                 </h3>
-                <button onclick="closeConfirmDisposalModal()" class="text-white hover:bg-rose-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeReturnBorrowModal()" class="text-white hover:bg-indigo-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form onsubmit="executeDisposalSubmit(event)" class="p-6 space-y-4">
-                <input type="hidden" id="disp-target-asset-number" value="">
-                <div class="p-3 bg-rose-50 border border-rose-100 rounded-lg text-xs space-y-1">
-                    <div><strong>เลขครุภัณฑ์:</strong> <span id="disp-modal-num" class="font-mono font-bold text-rose-700"></span></div>
-                    <div><strong>ชื่อพัสดุ:</strong> <span id="disp-modal-name" class="font-bold text-slate-800"></span></div>
+            <form onsubmit="handleReturnBorrowSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="return-borrow-id" value="">
+                <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs space-y-1">
+                    <div><strong>รหัสการยืม:</strong> <span id="return-disp-borrow-id" class="font-mono font-bold text-indigo-700"></span></div>
+                    <div><strong>พัสดุ:</strong> <span id="return-disp-asset-info" class="font-bold text-slate-800"></span></div>
+                    <div><strong>ผู้ยืม:</strong> <span id="return-disp-borrower" class="text-slate-600"></span></div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">วันที่จำหน่ายออก *</label>
-                    <input type="date" id="disp-modal-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 outline-none">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">วันที่นำมาคืน *</label>
+                    <input type="date" id="return-date-input" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">สาเหตุ/เหตุผลการจำหน่าย *</label>
-                    <textarea id="disp-modal-reason" required rows="3" placeholder="ระบุเหตุผล เช่น ชำรุดซ่อมไม่คุ้มค่า, เลิกใช้งาน, แทงจำหน่ายประจำปี..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 outline-none">ชำรุดตามอายุการใช้งาน แทงจำหน่ายออกตามระเบียบ</textarea>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">สภาพพัสดุ / หมายเหตุการคืน</label>
+                    <textarea id="return-note-input" rows="2" placeholder="เช่น คืนในสภาพปกติเรียบร้อยดี" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">คืนในสภาพปกติเรียบร้อยดี</textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeConfirmDisposalModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">ยกเลิก</button>
-                    <button type="submit" class="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium shadow-sm">ยืนยันจำหน่ายออก</button>
+                    <button type="button" onclick="closeReturnBorrowModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm">บันทึกรับคืนเรียบร้อย</button>
                 </div>
             </form>
         </div>
@@ -876,6 +990,24 @@
             return result;
         }
 
+        async function postToGoogleSheets(action, payload) {
+            try {
+                if (!scriptUrl) return;
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sheetId: sheetId,
+                        action: action,
+                        payload: payload
+                    })
+                });
+            } catch (err) {
+                console.error("Error posting to Apps Script API:", err);
+            }
+        }
+
         async function fetchGoogleSheetsData() {
             document.getElementById('loading-indicator').classList.remove('hidden');
             try {
@@ -907,6 +1039,35 @@
                         }
                     }
                 }
+
+                try {
+                    const borUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=borrow_history`;
+                    const borRes = await fetch(borUrl);
+                    const borText = await borRes.text();
+                    const borRows = parseCSV(borText);
+                    borrowData = [];
+                    if (borRows.length > 1) {
+                        for (let i = 1; i < borRows.length; i++) {
+                            let r = borRows[i];
+                            if (r.length >= 2 && r[0]) {
+                                borrowData.push({
+                                    borrowId: r[0] || '',
+                                    assetNumber: r[1] || '',
+                                    assetName: r[2] || '',
+                                    borrowerName: r[3] || '',
+                                    borrowerDept: r[4] || '',
+                                    borrowerPhone: r[5] || '',
+                                    locationUsed: r[6] || '',
+                                    borrowDate: r[7] || '',
+                                    dueDate: r[8] || '',
+                                    returnDate: r[9] || '-',
+                                    returnStatus: r[10] || 'อยู่ระหว่างยืม',
+                                    note: r[11] || ''
+                                });
+                            }
+                        }
+                    }
+                } catch(e) { console.log("Borrow history error"); }
 
                 try {
                     const repUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=repair_history`;
@@ -959,355 +1120,82 @@
 
                 renderInventoryTable();
                 renderDisposedTable();
+                renderBorrowDropdown();
+                renderBorrowTable();
                 renderRepairDropdown();
                 renderActiveRepairTable();
                 renderHistoryTable();
                 renderFutureTable();
+
             } catch (err) {
-                console.error("Error fetching Google Sheets:", err);
-                alert("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้ กรุณาตรวจสอบสิทธิ์การแชร์");
+                console.error("Data load error:", err);
             } finally {
                 document.getElementById('loading-indicator').classList.add('hidden');
             }
         }
 
-        async function postToGoogleSheets(action, payload) {
-            if (!scriptUrl) return false;
-            try {
-                await fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: action, sheetId: sheetId, payload: payload })
-                });
-                return true;
-            } catch (err) {
-                console.error("API Sync Error:", err);
-                return false;
-            }
-        }
-
-        function backupDatabase() {
-            if (!confirm("คุณต้องการดาวน์โหลดไฟล์สำรองข้อมูล (Backup JSON) ใช่หรือไม่?")) return;
-            const backupData = {
-                exportDate: new Date().toISOString(),
-                inventory: inventoryData,
-                repairHistory: repairData,
-                future: futureData
-            };
-            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `SchoolAsset_Backup_${new Date().toISOString().substring(0, 10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            alert("สำรองข้อมูล (Backup) สำเร็จเรียบร้อยแล้ว!");
-        }
-
-        function restoreDatabase(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (!confirm("การ Restore จะแทนที่ข้อมูลปัจจุบันทั้งหมดทั้งในเว็บและใน Google Sheets คุณต้องการดำเนินการต่อหรือไม่?")) return;
-            
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                try {
-                    const data = JSON.parse(event.target.result);
-                    if (data.inventory) inventoryData = data.inventory;
-                    if (data.repairHistory) repairData = data.repairHistory;
-                    if (data.future) futureData = data.future;
-
-                    document.getElementById('loading-indicator').classList.remove('hidden');
-                    await postToGoogleSheets('restoreDatabase', {
-                        inventory: inventoryData,
-                        repairHistory: repairData,
-                        future: futureData
-                    });
-
-                    renderInventoryTable();
-                    renderRepairDropdown();
-                    renderActiveRepairTable();
-                    renderHistoryTable();
-                    renderFutureTable();
-                    
-                    document.getElementById('loading-indicator').classList.add('hidden');
-                    alert("กู้คืนข้อมูล (Restore) และซิงค์ลง Google Sheets สำเร็จเรียบร้อยแล้ว!");
-                } catch (err) {
-                    document.getElementById('loading-indicator').classList.add('hidden');
-                    alert("ไฟล์สำรองข้อมูลไม่ถูกต้องหรือเสียหาย");
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function getFilteredInventory() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const category = document.getElementById('category-filter').value;
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-table-body');
+            const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+            const category = document.getElementById('category-filter')?.value || '';
             const year = document.getElementById('year-filter')?.value || '';
             const dept = document.getElementById('dept-filter')?.value || '';
 
-            return inventoryData.filter(item => {
+            const filtered = inventoryData.filter(item => {
                 if (item.isDisposed) return false;
-                const matchSearch = (item.assetNumber + ' ' + item.assetName + ' ' + item.brandModel + ' ' + item.location + ' ' + item.teacherInCharge).toLowerCase().includes(search);
-                const matchCat = !category || item.category === category;
-                const matchYear = !year || String(item.registrationYear).trim() === year;
+                const matchSearch = (item.assetNumber + ' ' + item.assetName + ' ' + item.brandModel).toLowerCase().includes(search);
+                const matchCategory = !category || item.category === category;
+                const matchYear = !year || item.registrationYear === year;
                 const matchDept = !dept || item.department === dept;
-                return matchSearch && matchCat && matchYear && matchDept;
+                return matchSearch && matchCategory && matchYear && matchDept;
             });
-        }
-
-        let selectedAssetForDisposal = null;
-
-        function searchAssetForDisposal() {
-            const query = document.getElementById('dispose-search-input').value.toLowerCase().trim();
-            const resultBox = document.getElementById('dispose-search-result');
-            if (!query) {
-                resultBox.classList.add('hidden');
-                selectedAssetForDisposal = null;
-                return;
-            }
-
-            const found = inventoryData.find(item => !item.isDisposed && (
-                item.assetNumber.toLowerCase().includes(query) ||
-                item.assetName.toLowerCase().includes(query)
-            ));
-
-            if (found) {
-                selectedAssetForDisposal = found;
-                document.getElementById('disp-result-asset-num').innerText = found.assetNumber;
-                document.getElementById('disp-result-asset-name').innerText = found.assetName;
-                document.getElementById('disp-result-detail').innerText = `ประเภท: ${found.category} | ยี่ห้อ/รุ่น: ${found.brandModel || '-'} | ห้อง: ${found.location || '-'} | ผู้รับผิดชอบ: ${found.teacherInCharge || '-'}`;
-                resultBox.classList.remove('hidden');
-            } else {
-                resultBox.classList.add('hidden');
-                selectedAssetForDisposal = null;
-            }
-        }
-
-        function openConfirmDisposalModal() {
-            if (!selectedAssetForDisposal) return;
-            document.getElementById('disp-target-asset-number').value = selectedAssetForDisposal.assetNumber;
-            document.getElementById('disp-modal-num').innerText = selectedAssetForDisposal.assetNumber;
-            document.getElementById('disp-modal-name').innerText = selectedAssetForDisposal.assetName;
-            document.getElementById('disp-modal-date').value = new Date().toISOString().substring(0, 10);
-            document.getElementById('confirm-disposal-modal').classList.remove('hidden');
-        }
-
-        function closeConfirmDisposalModal() { document.getElementById('confirm-disposal-modal').classList.add('hidden'); }
-
-        async function executeDisposalSubmit(e) {
-            e.preventDefault();
-            const assetNum = document.getElementById('disp-target-asset-number').value;
-            const disposeDate = document.getElementById('disp-modal-date').value;
-            const disposeReason = document.getElementById('disp-modal-reason').value;
-
-            const item = inventoryData.find(i => i.assetNumber === assetNum);
-            if (item) {
-                item.isDisposed = true;
-                item.disposeDate = disposeDate;
-                item.disposeReason = disposeReason;
-            }
-
-            closeConfirmDisposalModal();
-            document.getElementById('dispose-search-input').value = '';
-            document.getElementById('dispose-search-result').classList.add('hidden');
-            
-            renderInventoryTable();
-            renderDisposedTable();
-
-            await postToGoogleSheets('disposeInventory', {
-                assetNumber: assetNum,
-                disposeDate: disposeDate,
-                disposeReason: disposeReason
-            });
-
-            alert(`บันทึกจำหน่ายพัสดุเลขที่ ${assetNum} เรียบร้อยแล้ว`);
-        }
-
-        async function cancelDisposal(assetNum) {
-            if (!confirm(`คุณต้องการยกเลิกการจำหน่ายพัสดุเลขที่ ${assetNum} และนำกลับเข้าสู่ระบบทะเบียนพัสดุใช่หรือไม่?`)) return;
-            const item = inventoryData.find(i => i.assetNumber === assetNum);
-            if (item) {
-                item.isDisposed = false;
-                item.disposeDate = '';
-                item.disposeReason = '';
-            }
-
-            renderInventoryTable();
-            renderDisposedTable();
-
-            await postToGoogleSheets('cancelDisposal', { assetNumber: assetNum });
-            alert(`ยกเลิกการจำหน่ายพัสดุเลขที่ ${assetNum} และนำกลับเข้าทะเบียนเรียบร้อยแล้ว`);
-        }
-
-        function renderDisposedTable() {
-            const tbody = document.getElementById('disposed-table-body');
-            const search = (document.getElementById('disposed-filter-search')?.value || '').toLowerCase();
-
-            const disposedItems = inventoryData.filter(item => item.isDisposed && (
-                item.assetNumber.toLowerCase().includes(search) ||
-                item.assetName.toLowerCase().includes(search) ||
-                (item.disposeReason || '').toLowerCase().includes(search)
-            ));
-
-            document.getElementById('disposed-count-badge').innerText = `${disposedItems.length} รายการ`;
-
-            if (disposedItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีรายการพัสดุที่ถูกจำหน่ายออก</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = disposedItems.map(item => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="p-4 font-mono font-bold text-rose-700">${item.assetNumber}</td>
-                    <td class="p-4">
-                        <div class="font-bold text-slate-900">${item.assetName}</div>
-                        <div class="text-xs text-slate-500">${item.brandModel || '-'}</div>
-                    </td>
-                    <td class="p-4"><span class="bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full text-xs font-semibold">${item.category || '-'}</span></td>
-                    <td class="p-4 text-xs text-slate-600">
-                        <div>${item.department || '-'}</div>
-                        <div class="text-slate-400">ผู้รับผิดชอบ: ${item.teacherInCharge || '-'}</div>
-                    </td>
-                    <td class="p-4 text-xs text-slate-600">
-                        <div class="font-bold text-slate-800">วันที่: ${item.disposeDate || '-'}</div>
-                        <div class="text-rose-600">${item.disposeReason || '-'}</div>
-                    </td>
-                    <td class="p-4 text-right">
-                        <button onclick="cancelDisposal('${item.assetNumber}')" class="text-amber-700 hover:text-amber-900 text-xs font-semibold px-2.5 py-1 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 flex items-center gap-1 ml-auto" title="นำกลับเข้าทะเบียนพัสดุหลัก">
-                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> ยกเลิกจำหน่าย
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-
-            const printTbody = document.getElementById('disposed-report-tbody');
-            if (printTbody) {
-                printTbody.innerHTML = disposedItems.map((item, idx) => `
-                    <tr>
-                        <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
-                        <td class="border border-slate-400 p-2 font-mono text-[11px] font-bold">${item.assetNumber}</td>
-                        <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">รุ่น: ${item.brandModel || '-'}</span></td>
-                        <td class="border border-slate-400 p-2">${item.department || '-'}</td>
-                        <td class="border border-slate-400 p-2 text-center font-mono">${item.disposeDate || '-'}</td>
-                        <td class="border border-slate-400 p-2">${item.disposeReason || '-'}</td>
-                    </tr>
-                `).join('');
-            }
-
-            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
-        }
-
-        function printDisposedOfficialReport() {
-            const monthsName = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-            const now = new Date();
-            document.getElementById('disposed-report-printed-timestamp').innerText = `วันที่พิมพ์: ${now.getDate()} ${monthsName[now.getMonth() + 1]} พ.ศ. ${now.getFullYear() + 543}`;
-            window.print();
-        }
-
-        function populateInventoryFilters() {
-            const yearSelect = document.getElementById('year-filter');
-            const deptSelect = document.getElementById('dept-filter');
-            
-            if (yearSelect) {
-                const currentYear = yearSelect.value;
-                const years = [...new Set(inventoryData.map(i => i.registrationYear).filter(Boolean))].sort().reverse();
-                yearSelect.innerHTML = `<option value="">ทุกปี พ.ศ.</option>` + years.map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`).join('');
-            }
-            if (deptSelect) {
-                const currentDept = deptSelect.value;
-                const depts = [...new Set(inventoryData.map(i => i.department).filter(Boolean))].sort();
-                deptSelect.innerHTML = `<option value="">ทุกหน่วยงาน</option>` + depts.map(d => `<option value="${d}" ${d === currentDept ? 'selected' : ''}>${d}</option>`).join('');
-            }
-        }
-
-        function renderInventoryTable() {
-            const tbody = document.getElementById('inventory-table-body');
-            populateInventoryFilters();
-            const filtered = getFilteredInventory();
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบรายการพัสดุ</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบข้อมูลพัสดุในระบบ</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map((item, idx) => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="p-4 font-mono font-medium text-slate-800">${item.assetNumber}</td>
-                    <td class="p-4">
-                        <div class="font-bold text-slate-900">${item.assetName}</div>
-                        <div class="text-xs text-slate-500">${item.brandModel || '-'}</div>
-                    </td>
-                    <td class="p-4"><span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full text-xs font-semibold">${item.category || '-'}</span></td>
-                    <td class="p-4 text-xs text-slate-600">
-                        <div>ปี: ${item.registrationYear || '-'}</div>
-                        <div class="truncate max-w-xs" title="${item.specifications}">${item.specifications || '-'}</div>
-                    </td>
-                    <td class="p-4 text-xs text-slate-600">
-                        <div>${item.department || '-'}</div>
-                        <div class="text-slate-400">${item.location || '-'}</div>
-                    </td>
-                    <td class="p-4 text-xs text-slate-700 font-medium">${item.teacherInCharge || '-'}</td>
-                    <td class="p-4 text-right space-x-2">
-                        <button onclick="editInventory(${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 rounded">แก้ไข</button>
-                        <button onclick="deleteInventory(${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2.5 py-1 bg-red-50 hover:bg-red-100 rounded">ลบ</button>
-                    </td>
-                </tr>
-            `).join('');
-
-            const printTbody = document.getElementById('inventory-report-tbody');
-            if (printTbody) {
-                printTbody.innerHTML = filtered.map((item, idx) => `
-                    <tr>
-                        <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
-                        <td class="border border-slate-400 p-2 font-mono text-[11px] font-bold">${item.assetNumber}</td>
-                        <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">รุ่น: ${item.brandModel || '-'}</span></td>
-                        <td class="border border-slate-400 p-2">${item.category || '-'}</td>
-                        <td class="border border-slate-400 p-2">${item.department || '-'}<br><span class="text-slate-500">ห้อง: ${item.location || '-'}</span></td>
-                        <td class="border border-slate-400 p-2">${item.teacherInCharge || '-'}</td>
-                        <td class="border border-slate-400 p-2 text-center">${item.registrationYear || '-'}</td>
+            tbody.innerHTML = filtered.map(item => {
+                const globalIndex = inventoryData.indexOf(item);
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-mono font-bold text-indigo-600">${item.assetNumber}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-slate-800">${item.assetName}</div>
+                            <div class="text-xs text-slate-500">${item.brandModel || '-'}</div>
+                        </td>
+                        <td class="p-4 text-xs"><span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-md">${item.category || '-'}</span></td>
+                        <td class="p-4 text-xs text-slate-600">
+                            <div>ปี: ${item.registrationYear || '-'}</div>
+                            <div class="text-slate-400 truncate max-w-xs">${item.specifications || '-'}</div>
+                        </td>
+                        <td class="p-4 text-xs text-slate-600">
+                            <div>${item.department || '-'}</div>
+                            <div class="text-indigo-600">ห้อง: ${item.location || '-'}</div>
+                        </td>
+                        <td class="p-4 text-xs text-slate-600">${item.teacherInCharge || '-'}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="editInventory(${globalIndex})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2 py-1 bg-indigo-50 rounded">แก้ไข</button>
+                            <button onclick="deleteInventory(${globalIndex})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2 py-1 bg-red-50 rounded">ลบ</button>
+                        </td>
                     </tr>
-                `).join('');
-            }
+                `;
+            }).join('');
 
             if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
-        }
-
-        function printInventoryOfficialReport() {
-            const category = document.getElementById('category-filter').value;
-            const year = document.getElementById('year-filter').value;
-            const dept = document.getElementById('dept-filter').value;
-
-            let filterTexts = [];
-            if (category) filterTexts.push(`ประเภท: ${category}`);
-            if (year) filterTexts.push(`ปี พ.ศ.: ${year}`);
-            if (dept) filterTexts.push(`หน่วยงาน: ${dept}`);
-
-            let label = "รายงานทะเบียนคุมครุภัณฑ์และพัสดุอุปกรณ์";
-            if (filterTexts.length > 0) {
-                label += ` (` + filterTexts.join(' | ') + `)`;
-            }
-            document.getElementById('inv-report-filter-label').innerText = label;
-
-            const monthsName = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-            const now = new Date();
-            document.getElementById('inv-report-printed-timestamp').innerText = `วันที่พิมพ์: ${now.getDate()} ${monthsName[now.getMonth() + 1]} พ.ศ. ${now.getFullYear() + 543}`;
-
-            window.print();
         }
 
         function filterInventory() { renderInventoryTable(); }
 
-        function openInventoryModal(editIdx = null) {
+        function openInventoryModal(idx = null) {
             document.getElementById('inventory-modal').classList.remove('hidden');
-            if (editIdx !== null) {
+            if (idx !== null) {
                 document.getElementById('inventory-modal-title').innerText = 'แก้ไขรายการพัสดุ';
-                document.getElementById('inv-edit-index').value = editIdx;
-                const item = inventoryData[editIdx];
+                document.getElementById('inv-edit-index').value = idx;
+                const item = inventoryData[idx];
                 document.getElementById('inv-assetNumber').value = item.assetNumber;
                 document.getElementById('inv-assetName').value = item.assetName;
-                document.getElementById('inv-category').value = item.category || 'คอมพิวเตอร์/อิเล็กทรอนิกส์';
+                document.getElementById('inv-category').value = item.category;
                 document.getElementById('inv-brandModel').value = item.brandModel;
                 document.getElementById('inv-registrationYear').value = item.registrationYear;
                 document.getElementById('inv-location').value = item.location;
@@ -1333,17 +1221,25 @@
                 category: document.getElementById('inv-category').value,
                 brandModel: document.getElementById('inv-brandModel').value,
                 registrationYear: document.getElementById('inv-registrationYear').value,
-                specifications: document.getElementById('inv-specifications').value,
+                location: document.getElementById('inv-location').value,
                 department: document.getElementById('inv-department').value,
                 teacherInCharge: document.getElementById('inv-teacherInCharge').value,
-                location: document.getElementById('inv-location').value,
-                imageUrl: document.getElementById('inv-imageUrl').value
+                specifications: document.getElementById('inv-specifications').value,
+                imageUrl: document.getElementById('inv-imageUrl').value,
+                isDisposed: false,
+                disposeDate: '',
+                disposeReason: ''
             };
-            if (editIdx !== '') { inventoryData[editIdx] = newItem; } else { inventoryData.unshift(newItem); }
+
+            if (editIdx !== '') {
+                inventoryData[editIdx] = newItem;
+            } else {
+                inventoryData.unshift(newItem);
+            }
             renderInventoryTable();
             closeInventoryModal();
             await postToGoogleSheets('saveInventory', newItem);
-            alert("บันทึกข้อมูลพัสดุสำเร็จเรียบร้อย!");
+            alert("บันทึกรายการพัสดุเรียบร้อยแล้ว!");
         }
 
         function editInventory(idx) { openInventoryModal(idx); }
@@ -1358,9 +1254,281 @@
             }
         }
 
+        // Disposal Functions
+        function searchAssetForDisposal() {
+            const query = document.getElementById('dispose-search-input').value.toLowerCase().trim();
+            const resultPanel = document.getElementById('dispose-search-result');
+            if (!query) {
+                resultPanel.classList.add('hidden');
+                return;
+            }
+            const found = inventoryData.find(item => !item.isDisposed && (
+                item.assetNumber.toLowerCase().includes(query) || item.assetName.toLowerCase().includes(query)
+            ));
+
+            if (found) {
+                document.getElementById('disp-result-asset-num').innerText = found.assetNumber;
+                document.getElementById('disp-result-asset-name').innerText = found.assetName;
+                document.getElementById('disp-result-detail').innerText = `${found.brandModel || '-'} | ประจำห้อง: ${found.location || '-'} | ผู้รับผิดชอบ: ${found.teacherInCharge || '-'}`;
+                resultPanel.classList.remove('hidden');
+            } else {
+                resultPanel.classList.add('hidden');
+            }
+        }
+
+        async function openConfirmDisposalModal() {
+            const num = document.getElementById('disp-result-asset-num').innerText;
+            const reason = prompt("กรุณาระบุเหตุผลการจำหน่ายพัสดุ:", "ชำรุดตามสภาพ/ไม่คุ้มค่าซ่อม");
+            if (reason) {
+                const item = inventoryData.find(i => i.assetNumber === num);
+                if (item) {
+                    item.isDisposed = true;
+                    item.disposeDate = new Date().toISOString().substring(0, 10);
+                    item.disposeReason = reason;
+                    renderInventoryTable();
+                    renderDisposedTable();
+                    document.getElementById('dispose-search-result').classList.add('hidden');
+                    document.getElementById('dispose-search-input').value = '';
+                    await postToGoogleSheets('disposeInventory', item);
+                    alert("บันทึกการจำหน่ายพัสดุเรียบร้อยแล้ว!");
+                }
+            }
+        }
+
+        function renderDisposedTable() {
+            const tbody = document.getElementById('disposed-table-body');
+            if (!tbody) return;
+            const disposedList = inventoryData.filter(i => i.isDisposed);
+            if (disposedList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">ไม่มีรายการพัสดุที่จำหน่ายออก</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = disposedList.map(item => {
+                const globalIndex = inventoryData.indexOf(item);
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-mono font-bold text-rose-600">${item.assetNumber}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-slate-800">${item.assetName}</div>
+                            <div class="text-xs text-slate-500">${item.brandModel || '-'}</div>
+                        </td>
+                        <td class="p-4 text-xs text-slate-600">${item.department || '-'}</td>
+                        <td class="p-4 text-xs text-rose-600 font-medium">${item.disposeDate || '-'}</td>
+                        <td class="p-4 text-xs text-slate-600">${item.disposeReason || '-'}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="cancelDisposal(${globalIndex})" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded-md">ยกเลิกจำหน่าย</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function cancelDisposal(idx) {
+            if (confirm("คุณต้องการยกเลิกการจำหน่ายพัสดุชิ้นนี้เพื่อนำกลับเข้าสู่ทะเบียนใช่หรือไม่?")) {
+                inventoryData[idx].isDisposed = false;
+                const item = inventoryData[idx];
+                renderInventoryTable();
+                renderDisposedTable();
+                await postToGoogleSheets('cancelDisposal', item);
+                alert("ยกเลิกการจำหน่ายเรียบร้อยแล้ว!");
+            }
+        }
+
+        // Borrow Functions
+        function filterBorrowAssetOptions() {
+            const search = document.getElementById('borrow-search-input').value.toLowerCase().trim();
+            const select = document.getElementById('borrow-asset-select');
+            const filtered = inventoryData.filter(item => !item.isDisposed && (
+                (item.assetNumber || '').toLowerCase().includes(search) || 
+                (item.assetName || '').toLowerCase().includes(search) ||
+                (item.brandModel || '').toLowerCase().includes(search)
+            ));
+            select.innerHTML = `<option value="">-- กรุณาเลือกพัสดุ --</option>` + filtered.map(item => {
+                const originalIdx = inventoryData.indexOf(item);
+                return `<option value="${originalIdx}">${item.assetNumber} - ${item.assetName} (${item.brandModel || '-'})</option>`;
+            }).join('');
+            document.getElementById('borrow-search-count').innerText = search ? `พบพัสดุที่ตรงกัน ${filtered.length} รายการ` : '';
+            onBorrowAssetSelected();
+        }
+
+        function clearBorrowAssetSearch() {
+            document.getElementById('borrow-search-input').value = '';
+            filterBorrowAssetOptions();
+        }
+
+        function renderBorrowDropdown() {
+            filterBorrowAssetOptions();
+            const today = new Date().toISOString().substring(0, 10);
+            document.getElementById('borrow-date').value = today;
+            document.getElementById('borrow-due-date').value = today;
+        }
+
+        function onBorrowAssetSelected() {
+            const idx = document.getElementById('borrow-asset-select').value;
+            if (idx !== '' && inventoryData[idx]) {
+                const item = inventoryData[idx];
+                document.getElementById('borrow-asset-number').value = item.assetNumber;
+                document.getElementById('borrow-asset-name').value = item.assetName;
+            } else {
+                document.getElementById('borrow-asset-number').value = '';
+                document.getElementById('borrow-asset-name').value = '';
+            }
+        }
+
+        async function handleBorrowSubmit(e) {
+            e.preventDefault();
+            const newBorrow = {
+                borrowId: 'BR-' + new Date().getFullYear() + '-' + String(borrowData.length + 1).padStart(3, '0'),
+                assetNumber: document.getElementById('borrow-asset-number').value,
+                assetName: document.getElementById('borrow-asset-name').value,
+                borrowerName: document.getElementById('borrower-name').value,
+                borrowerDept: document.getElementById('borrower-dept').value,
+                borrowerPhone: document.getElementById('borrower-phone').value,
+                locationUsed: document.getElementById('borrow-location-used').value,
+                borrowDate: document.getElementById('borrow-date').value,
+                dueDate: document.getElementById('borrow-due-date').value,
+                returnDate: '-',
+                returnStatus: 'อยู่ระหว่างยืม',
+                note: ''
+            };
+            borrowData.unshift(newBorrow);
+            renderBorrowTable();
+            await postToGoogleSheets('saveBorrow', newBorrow);
+            alert("บันทึกทำรายการยืมพัสดุเรียบร้อยแล้ว!");
+            e.target.reset();
+            renderBorrowDropdown();
+            clearBorrowAssetSearch();
+        }
+
+        function renderBorrowTable() {
+            const tbody = document.getElementById('borrow-table-body');
+            const search = (document.getElementById('borrow-filter-search')?.value || '').toLowerCase();
+
+            const filtered = borrowData.filter(item => {
+                if (!item.borrowId) return false;
+                return (
+                    (item.borrowId || '').toLowerCase().includes(search) ||
+                    (item.assetNumber || '').toLowerCase().includes(search) ||
+                    (item.assetName || '').toLowerCase().includes(search) ||
+                    (item.borrowerName || '').toLowerCase().includes(search) ||
+                    (item.locationUsed || '').toLowerCase().includes(search)
+                );
+            });
+
+            document.getElementById('borrow-count-badge').innerText = `${filtered.length} รายการ`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบประวัติข้อมูลการยืมพัสดุ</td></tr>`;
+                const printTbodyEmpty = document.getElementById('borrow-report-tbody');
+                if (printTbodyEmpty) printTbodyEmpty.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">ไม่มีข้อมูลรายงานการยืม-คืนพัสดุ</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const isReturned = item.returnStatus === 'คืนแล้ว';
+                const globalIndex = borrowData.indexOf(item);
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-mono font-bold text-indigo-600">${item.borrowId}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-slate-800">${item.assetName}</div>
+                            <div class="text-xs font-mono text-slate-500">${item.assetNumber}</div>
+                        </td>
+                        <td class="p-4 text-xs text-slate-700">
+                            <div class="font-bold">${item.borrowerName}</div>
+                            <div class="text-slate-500">${item.borrowerDept || '-'} ${item.borrowerPhone ? `(${item.borrowerPhone})` : ''}</div>
+                        </td>
+                        <td class="p-4 text-xs text-slate-600">${item.locationUsed || '-'}</td>
+                        <td class="p-4 text-xs text-slate-600">
+                            <div>ยืม: ${item.borrowDate}</div>
+                            <div class="text-amber-700">กำหนดคืน: ${item.dueDate}</div>
+                            ${isReturned ? `<div class="text-emerald-600 font-bold">คืนเมื่อ: ${item.returnDate}</div>` : ''}
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${isReturned ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${item.returnStatus || 'อยู่ระหว่างยืม'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            ${!isReturned ? `
+                                <button onclick="openReturnBorrowModal(${globalIndex})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center gap-1 ml-auto">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> บันทึกรับคืน
+                                </button>
+                            ` : `<span class="text-xs text-slate-400 font-medium">${item.note || 'คืนแล้ว'}</span>`}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const printTbody = document.getElementById('borrow-report-tbody');
+            if (printTbody) {
+                printTbody.innerHTML = filtered.map((item, idx) => `
+                    <tr>
+                        <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
+                        <td class="border border-slate-400 p-2 font-mono text-[11px] font-bold text-indigo-700">${item.borrowId}</td>
+                        <td class="border border-slate-400 p-2 font-mono text-[11px]">${item.assetNumber}</td>
+                        <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">นำไปใช้: ${item.locationUsed || '-'}</span></td>
+                        <td class="border border-slate-400 p-2"><strong>${item.borrowerName}</strong><br><span class="text-slate-500">${item.borrowerDept || '-'}</span></td>
+                        <td class="border border-slate-400 p-2 text-center font-mono">${item.borrowDate}</td>
+                        <td class="border border-slate-400 p-2 text-center font-mono">${item.returnStatus === 'คืนแล้ว' ? item.returnDate : item.dueDate}</td>
+                        <td class="border border-slate-400 p-2 text-center font-bold">${item.returnStatus || 'อยู่ระหว่างยืม'}</td>
+                    </tr>
+                `).join('');
+            }
+
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        }
+
+        function openReturnBorrowModal(idx) {
+            const item = borrowData[idx];
+            if (!item) return;
+            document.getElementById('return-borrow-id').value = idx;
+            document.getElementById('return-disp-borrow-id').innerText = item.borrowId;
+            document.getElementById('return-disp-asset-info').innerText = `${item.assetNumber} - ${item.assetName}`;
+            document.getElementById('return-disp-borrower').innerText = `${item.borrowerName} (${item.borrowerDept || '-'})`;
+            document.getElementById('return-date-input').value = new Date().toISOString().substring(0, 10);
+            document.getElementById('return-note-input').value = 'คืนในสภาพปกติเรียบร้อยดี';
+            document.getElementById('return-borrow-modal').classList.remove('hidden');
+        }
+
+        function closeReturnBorrowModal() { document.getElementById('return-borrow-modal').classList.add('hidden'); }
+
+        async function handleReturnBorrowSubmit(e) {
+            e.preventDefault();
+            const idx = document.getElementById('return-borrow-id').value;
+            if (idx === '' || !borrowData[idx]) return;
+
+            const returnDate = document.getElementById('return-date-input').value;
+            const note = document.getElementById('return-note-input').value;
+
+            borrowData[idx].returnDate = returnDate;
+            borrowData[idx].returnStatus = 'คืนแล้ว';
+            borrowData[idx].note = note;
+
+            renderBorrowTable();
+            closeReturnBorrowModal();
+
+            await postToGoogleSheets('returnBorrow', {
+                borrowId: borrowData[idx].borrowId,
+                returnDate: returnDate,
+                note: note
+            });
+
+            alert("บันทึกรับคืนพัสดุเรียบร้อยแล้ว!");
+        }
+
+        function printBorrowOfficialReport() {
+            const monthsName = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            const now = new Date();
+            document.getElementById('borrow-report-printed-timestamp').innerText = `วันที่พิมพ์: ${now.getDate()} ${monthsName[now.getMonth() + 1]} พ.ศ. ${now.getFullYear() + 543}`;
+            window.print();
+        }
+
+        // Repair Functions
         function filterRepairAssetOptions() {
-            const search = document.getElementById('repair-search-input').value.toLowerCase().trim();
+            const search = document.getElementById('repair-search-input')?.value.toLowerCase().trim() || '';
             const select = document.getElementById('repair-asset-select');
+            if (!select) return;
             const filtered = inventoryData.filter(item => 
                 (item.assetNumber || '').toLowerCase().includes(search) || 
                 (item.assetName || '').toLowerCase().includes(search) ||
@@ -1370,29 +1538,36 @@
                 const originalIdx = inventoryData.indexOf(item);
                 return `<option value="${originalIdx}">${item.assetNumber} - ${item.assetName} (${item.brandModel || '-'})</option>`;
             }).join('');
-            document.getElementById('repair-search-count').innerText = search ? `พบพัสดุที่ตรงกัน ${filtered.length} รายการ` : '';
+            const countEl = document.getElementById('repair-search-count');
+            if (countEl) countEl.innerText = search ? `พบพัสดุที่ตรงกัน ${filtered.length} รายการ` : '';
             onRepairAssetSelected();
         }
 
         function clearRepairAssetSearch() {
-            document.getElementById('repair-search-input').value = '';
+            const searchInput = document.getElementById('repair-search-input');
+            if (searchInput) searchInput.value = '';
             filterRepairAssetOptions();
         }
 
         function renderRepairDropdown() {
             filterRepairAssetOptions();
-            document.getElementById('repair-date').value = new Date().toISOString().substring(0, 10);
+            const repDate = document.getElementById('repair-date');
+            if (repDate) repDate.value = new Date().toISOString().substring(0, 10);
         }
 
         function onRepairAssetSelected() {
-            const idx = document.getElementById('repair-asset-select').value;
+            const select = document.getElementById('repair-asset-select');
+            if (!select) return;
+            const idx = select.value;
+            const assetNumEl = document.getElementById('repair-asset-number');
+            const assetNameEl = document.getElementById('repair-asset-name');
             if (idx !== '' && inventoryData[idx]) {
                 const item = inventoryData[idx];
-                document.getElementById('repair-asset-number').value = item.assetNumber;
-                document.getElementById('repair-asset-name').value = item.assetName;
+                if (assetNumEl) assetNumEl.value = item.assetNumber;
+                if (assetNameEl) assetNameEl.value = item.assetName;
             } else {
-                document.getElementById('repair-asset-number').value = '';
-                document.getElementById('repair-asset-name').value = '';
+                if (assetNumEl) assetNumEl.value = '';
+                if (assetNameEl) assetNameEl.value = '';
             }
         }
 
@@ -1421,6 +1596,7 @@
 
         function renderActiveRepairTable() {
             const tbody = document.getElementById('repair-active-table-body');
+            if (!tbody) return;
             const activeRepairs = repairData.filter(item => item.status === 'รอซ่อม' || item.finishDate === '-');
             if (activeRepairs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">ไม่มีรายการพัสดุที่อยู่ระหว่างรอซ่อม</td></tr>`;
@@ -1543,7 +1719,8 @@
             const tbody = document.getElementById('history-table-body');
             const filtered = getFilteredHistory();
             
-            document.getElementById('history-count-badge').innerText = `${filtered.length} รายการ`;
+            const badge = document.getElementById('history-count-badge');
+            if (badge) badge.innerText = `${filtered.length} รายการ`;
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบข้อมูลประวัติการซ่อมตามเงื่อนไขที่สืบค้น</td></tr>`;
@@ -1574,16 +1751,18 @@
             `).join('');
 
             const printTbody = document.getElementById('official-report-tbody');
-            printTbody.innerHTML = filtered.map((item, idx) => `
-                <tr>
-                    <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
-                    <td class="border border-slate-400 p-2 font-mono text-[11px]"><strong>${item.repairId}</strong><br>${item.dateFound}</td>
-                    <td class="border border-slate-400 p-2 font-mono text-[11px]">${item.assetNumber}</td>
-                    <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">อาการ: ${item.issue}</span></td>
-                    <td class="border border-slate-400 p-2"><span class="text-slate-700">สาเหตุ: ${item.cause || '-'}</span><br><span class="text-emerald-800">วิธีแก้: ${item.solution || '-'}</span></td>
-                    <td class="border border-slate-400 p-2 text-center font-bold">${item.status || 'รอซ่อม'}</td>
-                </tr>
-            `).join('');
+            if (printTbody) {
+                printTbody.innerHTML = filtered.map((item, idx) => `
+                    <tr>
+                        <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
+                        <td class="border border-slate-400 p-2 font-mono text-[11px]"><strong>${item.repairId}</strong><br>${item.dateFound}</td>
+                        <td class="border border-slate-400 p-2 font-mono text-[11px]">${item.assetNumber}</td>
+                        <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">อาการ: ${item.issue}</span></td>
+                        <td class="border border-slate-400 p-2"><span class="text-slate-700">สาเหตุ: ${item.cause || '-'}</span><br><span class="text-emerald-800">วิธีแก้: ${item.solution || '-'}</span></td>
+                        <td class="border border-slate-400 p-2 text-center font-bold">${item.status || 'รอซ่อม'}</td>
+                    </tr>
+                `).join('');
+            }
         }
 
         function printOfficialReport() {
@@ -1607,6 +1786,7 @@
 
         function renderFutureTable() {
             const tbody = document.getElementById('future-table-body');
+            if (!tbody) return;
             if (futureData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีข้อมูลพัสดุปีหน้า</td></tr>`;
                 return;
@@ -1672,6 +1852,144 @@
                 await postToGoogleSheets('deleteFuture', { index: idx });
                 alert("ลบรายการแผนปีหน้าเรียบร้อยแล้ว!");
             }
+        }
+
+        function backupDatabase() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                inventory: inventoryData,
+                borrowHistory: borrowData,
+                repairHistory: repairData,
+                future: futureData
+            }, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `School_Asset_Backup_${new Date().toISOString().substring(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        async function restoreDatabase(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.inventory) inventoryData = parsed.inventory;
+                    if (parsed.borrowHistory) borrowData = parsed.borrowHistory;
+                    if (parsed.repairHistory) repairData = parsed.repairHistory;
+                    if (parsed.future) futureData = parsed.future;
+
+                    renderInventoryTable();
+                    renderDisposedTable();
+                    renderBorrowTable();
+                    renderActiveRepairTable();
+                    renderHistoryTable();
+                    renderFutureTable();
+
+                    await postToGoogleSheets('restoreDatabase', parsed);
+                    alert("กู้คืนข้อมูล (Restore) และซิงค์ลง Google Sheets สำเร็จเรียบร้อย!");
+                } catch(err) {
+                    alert("ไฟล์ JSON ไม่ถูกต้อง");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function promptClearDatabase() {
+            const pwd = prompt("กรุณากรอกรหัส PIN เพื่อยืนยันการล้างฐานข้อมูล:");
+            if (pwd === '11052524' || pwd === adminPassword) {
+                if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบถาวร ต้องการดำเนินการหรือไม่?")) {
+                    inventoryData = [];
+                    borrowData = [];
+                    repairData = [];
+                    futureData = [];
+
+                    renderInventoryTable();
+                    renderDisposedTable();
+                    renderBorrowTable();
+                    renderActiveRepairTable();
+                    renderHistoryTable();
+                    renderFutureTable();
+
+                    await postToGoogleSheets('clearDatabase', {});
+                    alert("ล้างฐานข้อมูลเรียบร้อยแล้ว");
+                }
+            } else if (pwd !== null) {
+                alert("รหัสผ่านไม่ถูกต้อง");
+            }
+        }
+
+        async function importCSVData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const rows = parseCSV(text);
+                if (rows.length > 1) {
+                    for (let i = 1; i < rows.length; i++) {
+                        let r = rows[i];
+                        if (r.length >= 2 && r[0]) {
+                            const newItem = {
+                                assetNumber: r[0] || '',
+                                assetName: r[1] || '',
+                                category: r[2] || 'คอมพิวเตอร์/อิเล็กทรอนิกส์',
+                                brandModel: r[3] || '',
+                                registrationYear: r[4] || '',
+                                specifications: r[5] || '',
+                                department: r[6] || '',
+                                teacherInCharge: r[7] || '',
+                                location: r[8] || '',
+                                imageUrl: r[9] || '',
+                                isDisposed: false,
+                                disposeDate: '',
+                                disposeReason: ''
+                            };
+                            inventoryData.unshift(newItem);
+                            await postToGoogleSheets('saveInventory', newItem);
+                        }
+                    }
+                    renderInventoryTable();
+                    alert("นำเข้าข้อมูล CSV และบันทึกลง Google Sheets เรียบร้อยแล้ว!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function printInventoryOfficialReport() {
+            const category = document.getElementById('category-filter')?.value || '';
+            const year = document.getElementById('year-filter')?.value || '';
+            const dept = document.getElementById('dept-filter')?.value || '';
+
+            const filtered = inventoryData.filter(item => {
+                if (item.isDisposed) return false;
+                const matchCategory = !category || item.category === category;
+                const matchYear = !year || item.registrationYear === year;
+                const matchDept = !dept || item.department === dept;
+                return matchCategory && matchYear && matchDept;
+            });
+
+            const printTbody = document.getElementById('inventory-report-tbody');
+            if (printTbody) {
+                printTbody.innerHTML = filtered.map((item, idx) => `
+                    <tr>
+                        <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
+                        <td class="border border-slate-400 p-2 font-mono text-[11px] font-bold text-indigo-700">${item.assetNumber}</td>
+                        <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">${item.brandModel || '-'}</span></td>
+                        <td class="border border-slate-400 p-2">${item.category || '-'}</td>
+                        <td class="border border-slate-400 p-2">${item.department || '-'}<br><span class="text-slate-500 font-bold">ห้อง: ${item.location || '-'}</span></td>
+                        <td class="border border-slate-400 p-2">${item.teacherInCharge || '-'}</td>
+                        <td class="border border-slate-400 p-2 text-center font-mono">${item.registrationYear || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+
+            const monthsName = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            const now = new Date();
+            document.getElementById('inv-report-printed-timestamp').innerText = `วันที่พิมพ์: ${now.getDate()} ${monthsName[now.getMonth() + 1]} พ.ศ. ${now.getFullYear() + 543}`;
+            window.print();
         }
 
         function openConfigModal() { document.getElementById('config-modal').classList.remove('hidden'); }
