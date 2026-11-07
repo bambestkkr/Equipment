@@ -1067,7 +1067,7 @@
                             }
                         }
                     }
-                } catch(e) { console.log("Borrow history error"); }
+                } catch(e) { console.log("Borrow history fetch error"); }
 
                 try {
                     const repUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=repair_history`;
@@ -1094,7 +1094,7 @@
                             }
                         }
                     }
-                } catch(e) { console.log("Repair history error"); }
+                } catch(e) { console.log("Repair history fetch error"); }
 
                 try {
                     const futUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=future_inventory`;
@@ -1116,7 +1116,7 @@
                             }
                         }
                     }
-                } catch(e) { console.log("Future inventory error"); }
+                } catch(e) { console.log("Future inventory fetch error"); }
 
                 renderInventoryTable();
                 renderDisposedTable();
@@ -2006,7 +2006,7 @@
                 document.getElementById('display-sheet-id').innerText = sheetId;
                 closeConfigModal();
                 fetchGoogleSheetsData();
-                alert("บันทึกการตั้งค่าเรียบร้อยแล้ว!");
+                alert("บันทึกการตั้งค่า Sheet ID เรียบร้อยแล้ว!");
             } else {
                 alert("กรุณากรอก Sheet ID ให้ถูกต้อง");
             }
