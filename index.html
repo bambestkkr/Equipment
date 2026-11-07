@@ -1,7 +1,3 @@
-<?php
-// ตั้งค่า Content-Type และ Encoding สำหรับ PHP Server
-header('Content-Type: text/html; charset=UTF-8');
-?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -14,7 +10,7 @@ header('Content-Type: text/html; charset=UTF-8');
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- QRCode Generator CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts (Sarabun) -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; }
@@ -27,12 +23,12 @@ header('Content-Type: text/html; charset=UTF-8');
         .print-only { display: none; }
     </style>
     <script>
-        // กำหนดค่าเริ่มต้นของ Sheet ID และ Script URL ใน LocalStorage
+        // ค่าเริ่มต้น Sheet ID, Script URL และ Password ผู้ดูแลระบบ
         let sheetId = localStorage.getItem('school_asset_sheet_id') || '1IAURmSXWIIt7c4zAXaQaAJMN08fslDujD6O7DLZipmo';
         let scriptUrl = localStorage.getItem('school_asset_script_url') || '';
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
 
-        // โครงสร้างตัวแปรเก็บข้อมูลระบบ
+        // ตัวแปรเก็บข้อมูลหลักของระบบ
         let inventoryData = [];
         let borrowData = [];
         let repairData = [];
@@ -60,7 +56,7 @@ header('Content-Type: text/html; charset=UTF-8');
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Custom Alert Notification Modal (แทนการใช้ alert สด) -->
+    <!-- Custom Alert Modal Notification -->
     <div id="custom-alert-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
             <div id="alert-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-indigo-100 text-indigo-600">
@@ -74,7 +70,7 @@ header('Content-Type: text/html; charset=UTF-8');
         </div>
     </div>
 
-    <!-- Custom Confirm Dialog Modal (แทนการใช้ confirm สด) -->
+    <!-- Custom Confirm Dialog Modal -->
     <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
             <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-amber-100 text-amber-600">
@@ -730,7 +726,7 @@ header('Content-Type: text/html; charset=UTF-8');
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i> Delete ฐานข้อมูล (ล้างข้อมูล)</h3>
-                                <p class="text-xs text-slate-500 mt-1">ล้างข้อมูลพัสดุและประวัติทั้งหมดในระบบ (ต้องใช้รหัส PIN)</p>
+                                <p class="text-xs text-slate-500 mt-1">ล้างข้อมูลพัสดุและประวัติทั้งหมดในระบบ</p>
                             </div>
                             <button onclick="promptClearDatabase()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full">ล้างฐานข้อมูลทั้งหมด</button>
                         </div>
@@ -981,13 +977,17 @@ header('Content-Type: text/html; charset=UTF-8');
                 <button onclick="closeConfigModal()" class="text-white hover:bg-slate-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="p-6 space-y-4">
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                    <strong>คำแนะนำการเชื่อมต่อเพื่อการบันทึก/แก้ไข/ลบ:</strong><br>
+                    ต้องติดตั้ง Google Apps Script แบบ Web App โดยตั้งค่า <em>Execute as: Me</em> และ <em>Who has access: Anyone (ทุกคน)</em> แล้วคัดลอก URL มาวางในช่องด้านล่าง
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Google Sheet ID</label>
                     <input type="text" id="config-sheet-id-input" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Google Apps Script Web App API URL</label>
-                    <input type="url" id="config-script-url-input" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="url" id="config-script-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeConfigModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium">ยกเลิก</button>
@@ -1001,7 +1001,7 @@ header('Content-Type: text/html; charset=UTF-8');
     <script>
         let pendingConfirmCallback = null;
 
-        // ฟังก์ชันสร้าง Custom Alert Notification
+        // Custom Alert Dialog Modal Function
         function showAlert(title, message, type = 'info') {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-message').innerText = message;
@@ -1025,7 +1025,7 @@ header('Content-Type: text/html; charset=UTF-8');
             document.getElementById('custom-alert-modal').classList.add('hidden');
         }
 
-        // ฟังก์ชันสร้าง Custom Confirm Dialog
+        // Custom Confirm Dialog Modal Function
         function showConfirm(title, message, onConfirm) {
             document.getElementById('confirm-title').innerText = title;
             document.getElementById('confirm-message').innerText = message;
@@ -1109,20 +1109,27 @@ header('Content-Type: text/html; charset=UTF-8');
         }
 
         async function postToGoogleSheets(action, payload) {
+            if (!scriptUrl) {
+                showAlert("แจ้งเตือนการเชื่อมต่อ", "ยังไม่ได้ตั้งค่า Web App API URL ข้อมูลจะปรับเปลี่ยนชั่วคราวบนหน้าจอ หากต้องการบันทึกลง Google Sheets ถาวร กรุณาไปที่ปุ่ม 'ตั้งค่าเชื่อมต่อ'", "info");
+                return { success: false, message: 'Script URL missing' };
+            }
             try {
-                if (!scriptUrl) return;
-                await fetch(scriptUrl, {
+                const response = await fetch(scriptUrl, {
                     method: 'POST',
                     mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
                         sheetId: sheetId,
                         action: action,
                         payload: payload
                     })
                 });
+                const resData = await response.json().catch(() => ({ success: true }));
+                return resData;
             } catch (err) {
                 console.error("Error posting to Apps Script API:", err);
+                showAlert("ข้อผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ Google Apps Script Web App API! กรุณาตรวจสอบว่า URL ถูกต้องและเปิดสิทธิ์ 'Anyone'", "error");
+                return { success: false, error: err };
             }
         }
 
@@ -2048,7 +2055,8 @@ header('Content-Type: text/html; charset=UTF-8');
                 itemName: document.getElementById('fut-itemName').value,
                 details: document.getElementById('fut-details').value,
                 quantity: document.getElementById('fut-quantity').value,
-                dataLink: document.getElementById('fut-dataLink').value
+                dataLink: document.getElementById('fut-dataLink').value,
+                index: editIdx !== '' ? Number(editIdx) : -1
             };
 
             if (editIdx !== '') {
@@ -2064,10 +2072,11 @@ header('Content-Type: text/html; charset=UTF-8');
 
         function deleteFuture(idx) {
             showConfirm("ยืนยันการลบ", "คุณต้องการลบรายการพัสดุปีหน้าชิ้นนี้ใช่หรือไม่?", async () => {
+                const deletedItem = futureData[idx];
                 futureData.splice(idx, 1);
                 renderFutureTable();
-                await postToGoogleSheets('deleteFuture', { index: idx });
-                showAlert("สำเร็จ", "ลบรายการเรียบร้อยแล้ว", "success");
+                await postToGoogleSheets('deleteFuture', { index: idx, item: deletedItem });
+                showAlert("สำเร็จ", "ลบรายการพัสดุปีหน้าเรียบร้อยแล้ว!", "success");
             });
         }
 
