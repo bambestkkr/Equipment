@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบทะเบียนคุมพัสดุอุปกรณ์คอมพิวเตอร์ครูศรันย์กรณ์</title>
+    <title>ระบบทะเบียนคุมพัสดุอุปกรณ์คอมพิวเตอร์ - โรงเรียนคงคาราม</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode Generator CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -21,7 +23,7 @@
         .print-only { display: none; }
     </style>
     <script>
-        let sheetId = localStorage.getItem('school_asset_sheet_id') || '1xU8DWN6mPCjjzoKRVD1odekK5kUMZadWoslohlNbJR8';
+        let sheetId = localStorage.getItem('school_asset_sheet_id') || '1IAURmSXWIIt7c4zAXaQaAJMN08fslDujD6O7DLZipmo';
         let scriptUrl = localStorage.getItem('school_asset_script_url') || '';
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
 
@@ -126,6 +128,30 @@
 
             <!-- Tab 1: Inventory -->
             <div id="tab-inventory" class="tab-content space-y-6">
+                <!-- Dashboard Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 no-print">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-medium text-slate-500">พัสดุในระบบทั้งหมด</div>
+                        <div id="stat-total-inv" class="text-2xl font-bold text-indigo-600 mt-1">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-medium text-slate-500">พร้อมใช้งาน</div>
+                        <div id="stat-available-inv" class="text-2xl font-bold text-emerald-600 mt-1">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-medium text-slate-500">อยู่ระหว่างยืม</div>
+                        <div id="stat-borrowed-inv" class="text-2xl font-bold text-amber-600 mt-1">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-medium text-slate-500">รอซ่อมบำรุง</div>
+                        <div id="stat-repair-inv" class="text-2xl font-bold text-rose-600 mt-1">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-medium text-slate-500">จำหน่ายออกแล้ว</div>
+                        <div id="stat-disposed-inv" class="text-2xl font-bold text-slate-400 mt-1">0</div>
+                    </div>
+                </div>
+
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-wrap">
                         <input type="text" id="search-input" oninput="filterInventory()" placeholder="ค้นหาเลขครุภัณฑ์, ชื่อ, รุ่น..." class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-64 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
@@ -676,7 +702,7 @@
                                 <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ (โครงสร้าง 10 คอลัมน์ตรงตามฟอร์ม)</p>
                             </div>
                             <div class="flex gap-2">
-                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B.B7%E0%B9%89%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%A3%E0%B8%B9%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%90%E0%B8%A3%E0%B8%BE%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B9%8AAcer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%A3%E0%B8%A3%E0%B8%A1%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%90%E0%B8%A3%E0%B8%BE%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B9%8AAcer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดไฟล์ตัวอย่าง CSV
                                 </a>
                                 <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
@@ -699,6 +725,27 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- QR Code & Asset Label Modal -->
+    <div id="qrcode-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-6">
+            <h3 class="font-bold text-slate-900 text-base mb-1">สติ๊กเกอร์ QR Code ครุภัณฑ์</h3>
+            <p class="text-xs text-slate-500 mb-4">สำหรับปริ้นท์ติดบนตัวเครื่องพัสดุ</p>
+            <div class="p-4 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50" id="qrcode-print-area">
+                <div class="text-xs font-bold text-slate-800 mb-1">โรงเรียนคงคาราม</div>
+                <div id="qrcode-canvas-container" class="my-2"></div>
+                <div id="qr-asset-number" class="font-mono font-bold text-sm text-indigo-700"></div>
+                <div id="qr-asset-name" class="text-xs text-slate-700 font-semibold truncate max-w-[200px]"></div>
+                <div id="qr-asset-location" class="text-[10px] text-slate-500"></div>
+            </div>
+            <div class="flex gap-2 mt-5">
+                <button onclick="closeQRCodeModal()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs">ปิด</button>
+                <button onclick="window.print()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-xs shadow-sm flex items-center justify-center gap-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> พิมพ์สติ๊กเกอร์
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Return Borrow Modal -->
@@ -1144,6 +1191,8 @@
                     }
                 } catch(e) { console.log("Future inventory fetch error"); }
 
+                updateDashboardStats();
+                updateFilterDropdowns();
                 renderInventoryTable();
                 renderDisposedTable();
                 renderBorrowDropdown();
@@ -1158,6 +1207,35 @@
             } finally {
                 document.getElementById('loading-indicator').classList.add('hidden');
             }
+        }
+
+        function updateDashboardStats() {
+            const activeAssets = inventoryData.filter(i => !i.isDisposed);
+            const disposedAssets = inventoryData.filter(i => i.isDisposed);
+            const borrowedCount = borrowData.filter(b => b.returnStatus === 'อยู่ระหว่างยืม').length;
+            const repairCount = repairData.filter(r => r.status === 'รอซ่อม' || r.finishDate === '-').length;
+            const availableCount = Math.max(0, activeAssets.length - borrowedCount - repairCount);
+
+            document.getElementById('stat-total-inv').innerText = activeAssets.length;
+            document.getElementById('stat-available-inv').innerText = availableCount;
+            document.getElementById('stat-borrowed-inv').innerText = borrowedCount;
+            document.getElementById('stat-repair-inv').innerText = repairCount;
+            document.getElementById('stat-disposed-inv').innerText = disposedAssets.length;
+        }
+
+        function updateFilterDropdowns() {
+            const yearSelect = document.getElementById('year-filter');
+            const deptSelect = document.getElementById('dept-filter');
+            if (!yearSelect || !deptSelect) return;
+
+            const years = [...new Set(inventoryData.map(item => item.registrationYear).filter(Boolean))].sort().reverse();
+            const depts = [...new Set(inventoryData.map(item => item.department).filter(Boolean))].sort();
+
+            yearSelect.innerHTML = '<option value="">ทุกปี พ.ศ.</option>' + 
+                years.map(y => `<option value="${y}">${y}</option>`).join('');
+
+            deptSelect.innerHTML = '<option value="">ทุกหน่วยงาน</option>' + 
+                depts.map(d => `<option value="${d}">${d}</option>`).join('');
         }
 
         function renderInventoryTable() {
@@ -1197,10 +1275,11 @@
                         </td>
                         <td class="p-4 text-xs text-slate-600">
                             <div>${item.department || '-'}</div>
-                            <div class="text-indigo-600">ห้อง: ${item.location || '-'}</div>
+                            <div class="text-indigo-600 font-medium">ห้อง: ${item.location || '-'}</div>
                         </td>
                         <td class="p-4 text-xs text-slate-600">${item.teacherInCharge || '-'}</td>
-                        <td class="p-4 text-right space-x-2">
+                        <td class="p-4 text-right space-x-1.5">
+                            <button onclick="openQRCodeModal(${globalIndex})" title="สแกน/พิมพ์ QR Code" class="text-slate-600 hover:text-slate-800 text-xs font-semibold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded">QR</button>
                             <button onclick="editInventory(${globalIndex})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2 py-1 bg-indigo-50 rounded">แก้ไข</button>
                             <button onclick="deleteInventory(${globalIndex})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2 py-1 bg-red-50 rounded">ลบ</button>
                         </td>
@@ -1212,6 +1291,29 @@
         }
 
         function filterInventory() { renderInventoryTable(); }
+
+        function openQRCodeModal(idx) {
+            const item = inventoryData[idx];
+            if (!item) return;
+            document.getElementById('qr-asset-number').innerText = item.assetNumber;
+            document.getElementById('qr-asset-name').innerText = item.assetName;
+            document.getElementById('qr-asset-location').innerText = `ห้อง: ${item.location || '-'} (${item.department || '-'})`;
+
+            const container = document.getElementById('qrcode-canvas-container');
+            container.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(container, {
+                    text: item.assetNumber,
+                    width: 120,
+                    height: 120
+                });
+            }
+            document.getElementById('qrcode-modal').classList.remove('hidden');
+        }
+
+        function closeQRCodeModal() {
+            document.getElementById('qrcode-modal').classList.add('hidden');
+        }
 
         function openInventoryModal(idx = null) {
             document.getElementById('inventory-modal').classList.remove('hidden');
@@ -1262,6 +1364,8 @@
             } else {
                 inventoryData.unshift(newItem);
             }
+            updateDashboardStats();
+            updateFilterDropdowns();
             renderInventoryTable();
             closeInventoryModal();
             await postToGoogleSheets('saveInventory', newItem);
@@ -1274,6 +1378,7 @@
             if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
                 const deletedItem = inventoryData[idx];
                 inventoryData.splice(idx, 1);
+                updateDashboardStats();
                 renderInventoryTable();
                 await postToGoogleSheets('deleteInventory', deletedItem);
                 alert("ลบรายการพัสดุเรียบร้อยแล้ว");
@@ -1310,6 +1415,7 @@
                     item.isDisposed = true;
                     item.disposeDate = new Date().toISOString().substring(0, 10);
                     item.disposeReason = reason;
+                    updateDashboardStats();
                     renderInventoryTable();
                     renderDisposedTable();
                     document.getElementById('dispose-search-result').classList.add('hidden');
@@ -1352,6 +1458,7 @@
             if (confirm("คุณต้องการยกเลิกการจำหน่ายพัสดุชิ้นนี้เพื่อนำกลับเข้าสู่ทะเบียนใช่หรือไม่?")) {
                 inventoryData[idx].isDisposed = false;
                 const item = inventoryData[idx];
+                updateDashboardStats();
                 renderInventoryTable();
                 renderDisposedTable();
                 await postToGoogleSheets('cancelDisposal', item);
@@ -1402,7 +1509,7 @@
         async function handleBorrowSubmit(e) {
             e.preventDefault();
             const newBorrow = {
-                borrowId: 'BR-' + new Date().getFullYear() + '-' + String(borrowData.length + 1).padStart(3, '0'),
+                borrowId: 'BR-' + new Date().getFullYear() + '-' + String(borrowData.length + 1).padStart(4, '0'),
                 assetNumber: document.getElementById('borrow-asset-number').value,
                 assetName: document.getElementById('borrow-asset-name').value,
                 borrowerName: document.getElementById('borrower-name').value,
@@ -1416,6 +1523,7 @@
                 note: ''
             };
             borrowData.unshift(newBorrow);
+            updateDashboardStats();
             renderBorrowTable();
             await postToGoogleSheets('saveBorrow', newBorrow);
             alert("บันทึกทำรายการยืมพัสดุเรียบร้อยแล้ว!");
@@ -1529,6 +1637,7 @@
             borrowData[idx].returnStatus = 'คืนแล้ว';
             borrowData[idx].note = note;
 
+            updateDashboardStats();
             renderBorrowTable();
             closeReturnBorrowModal();
 
@@ -1597,7 +1706,7 @@
         async function handleRepairSubmit(e) {
             e.preventDefault();
             const newRepair = {
-                repairId: 'RP-' + new Date().getFullYear() + '-' + String(repairData.length + 1).padStart(3, '0'),
+                repairId: 'RP-' + new Date().getFullYear() + '-' + String(repairData.length + 1).padStart(4, '0'),
                 assetNumber: document.getElementById('repair-asset-number').value,
                 assetName: document.getElementById('repair-asset-name').value,
                 issue: document.getElementById('repair-issue').value,
@@ -1609,6 +1718,7 @@
                 status: 'รอซ่อม'
             };
             repairData.unshift(newRepair);
+            updateDashboardStats();
             renderActiveRepairTable();
             await postToGoogleSheets('saveRepair', newRepair);
             alert("บันทึกแจ้งซ่อมเรียบร้อยแล้ว!");
@@ -1686,6 +1796,7 @@
             repairData[idx].finishDate = finishDate;
             repairData[idx].status = status;
 
+            updateDashboardStats();
             renderActiveRepairTable();
             renderHistoryTable();
             closeCompleteRepairModal();
@@ -1822,7 +1933,7 @@
                     <td class="p-4 text-center"><span class="bg-slate-100 px-2 py-1 rounded font-bold text-slate-700">${item.quantity}</span></td>
                     <td class="p-4 text-xs">${item.dataLink ? `<a href="${item.dataLink}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1">เปิดลิงก์ <i data-lucide="external-link" class="w-3 h-3"></i></a>` : '-'}</td>
                     <td class="p-4 text-right space-x-2">
-                        <button onclick="editFuture(${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 rounded">แก้ไข</button>
+                        <button onclick="openFutureModal(${idx})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 rounded">แก้ไข</button>
                         <button onclick="deleteFuture(${idx})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2.5 py-1 bg-red-50 hover:bg-red-100 rounded">ลบ</button>
                     </td>
                 </tr>
@@ -1909,13 +2020,15 @@
                     if (confirm("คุณต้องการกู้คืนข้อมูล (Restore) และซิงค์ทับข้อมูลทั้งหมดลง Google Sheets ใช่หรือไม่?")) {
                         document.getElementById('loading-indicator').classList.remove('hidden');
                         
-                        const res = await postToGoogleSheets('restoreDatabase', parsed);
+                        await postToGoogleSheets('restoreDatabase', parsed);
                         
                         if (parsed.inventory) inventoryData = parsed.inventory;
                         if (parsed.borrowHistory) borrowData = parsed.borrowHistory;
                         if (parsed.repairHistory) repairData = parsed.repairHistory;
                         if (parsed.future) futureData = parsed.future;
 
+                        updateDashboardStats();
+                        updateFilterDropdowns();
                         renderInventoryTable();
                         renderDisposedTable();
                         renderBorrowTable();
@@ -1947,12 +2060,14 @@
                 if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบถาวรจาก Google Sheets ต้องการดำเนินการหรือไม่?")) {
                     document.getElementById('loading-indicator').classList.remove('hidden');
                     try {
-                        const res = await postToGoogleSheets('clearDatabase', {});
+                        await postToGoogleSheets('clearDatabase', {});
                         inventoryData = [];
                         borrowData = [];
                         repairData = [];
                         futureData = [];
 
+                        updateDashboardStats();
+                        updateFilterDropdowns();
                         renderInventoryTable();
                         renderDisposedTable();
                         renderBorrowTable();
@@ -2004,6 +2119,8 @@
                             await postToGoogleSheets('saveInventory', newItem);
                         }
                     }
+                    updateDashboardStats();
+                    updateFilterDropdowns();
                     renderInventoryTable();
                     alert("นำเข้าข้อมูล CSV และบันทึกลง Google Sheets เรียบร้อยแล้ว!");
                 }
