@@ -120,9 +120,9 @@
             <!-- Tab 1: Inventory -->
             <div id="tab-inventory" class="tab-content space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <input type="text" id="search-input" oninput="filterInventory()" placeholder="ค้นหาเลขครุภัณฑ์, ชื่อ, รุ่น..." class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-72 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
-                        <select id="category-filter" onchange="filterInventory()" class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-48 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-wrap">
+                        <input type="text" id="search-input" oninput="filterInventory()" placeholder="ค้นหาเลขครุภัณฑ์, ชื่อ, รุ่น..." class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-64 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                        <select id="category-filter" onchange="filterInventory()" class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-44 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
                             <option value="">ทุกประเภท</option>
                             <option value="คอมพิวเตอร์/อิเล็กทรอนิกส์">คอมพิวเตอร์/อิเล็กทรอนิกส์</option>
                             <option value="ครุภัณฑ์/เฟอร์นิเจอร์">ครุภัณฑ์/เฟอร์นิเจอร์</option>
@@ -133,13 +133,24 @@
                             <option value="วัสดุสำนักงาน">วัสดุสำนักงาน</option>
                             <option value="อื่นๆ">อื่นๆ</option>
                         </select>
+                        <select id="year-filter" onchange="filterInventory()" class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-32 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                            <option value="">ทุกปี พ.ศ.</option>
+                        </select>
+                        <select id="dept-filter" onchange="filterInventory()" class="px-4 py-2 border border-slate-300 rounded-lg w-full sm:w-40 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                            <option value="">ทุกหน่วยงาน</option>
+                        </select>
                     </div>
-                    <button onclick="openInventoryModal()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm text-sm font-medium transition">
-                        <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มรายการพัสดุ
-                    </button>
+                    <div class="flex gap-2 w-full sm:w-auto justify-end">
+                        <button onclick="printInventoryOfficialReport()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm text-sm font-medium transition">
+                            <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์รายงานพัสดุ A4
+                        </button>
+                        <button onclick="openInventoryModal()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm text-sm font-medium transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มรายการพัสดุ
+                        </button>
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
@@ -157,29 +168,62 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Printable Official Inventory A4 Report Section -->
+                <div id="printable-inventory-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
+                    <div class="text-center space-y-1 mb-6">
+                        <div class="font-bold text-xl">รายงานทะเบียนคุมครุภัณฑ์และพัสดุอุปกรณ์</div>
+                        <div class="text-sm">โรงเรียนคงคาราม อำเภอเมือง จังหวัดราชบุรี</div>
+                        <div id="inv-report-filter-label" class="text-xs text-slate-600 mt-1">สรุปรายการพัสดุอุปกรณ์คอมพิวเตอร์และครุภัณฑ์ประจำโรงเรียน</div>
+                    </div>
+                    <div class="flex justify-between text-xs mb-4 pb-2 border-b border-slate-300">
+                        <div>ผู้รับผิดชอบ: <strong>ครูศรันย์กรณ์ อาจณรงค์กร</strong></div>
+                        <div id="inv-report-printed-timestamp">วันที่พิมพ์: -</div>
+                    </div>
+                    <table class="w-full text-left text-xs border-collapse border border-slate-400 mb-8">
+                        <thead>
+                            <tr class="bg-slate-200 text-slate-900 font-bold">
+                                <th class="border border-slate-400 p-2 text-center w-10">ที่</th>
+                                <th class="border border-slate-400 p-2 w-28">เลขครุภัณฑ์</th>
+                                <th class="border border-slate-400 p-2">ชื่อพัสดุ / ยี่ห้อรุ่น</th>
+                                <th class="border border-slate-400 p-2 w-28">ประเภท</th>
+                                <th class="border border-slate-400 p-2 w-24">หน่วยงาน/ห้อง</th>
+                                <th class="border border-slate-400 p-2 w-24">ผู้รับผิดชอบ</th>
+                                <th class="border border-slate-400 p-2 w-16 text-center">ปีที่ลง</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-report-tbody"></tbody>
+                    </table>
+                    <div class="flex justify-between mt-12 text-sm page-break">
+                        <div class="text-center space-y-16 w-64">
+                            <div>ลงชื่อ......................................................ผู้รายงาน<br>(นายศรันย์กรณ์ อาจณรงค์กร)<br>ครูผู้รับผิดชอบงานพัสดุ</div>
+                        </div>
+                        <div class="text-center space-y-16 w-64">
+                            <div>ลงชื่อ......................................................ผู้ตรวจสอบ<br>(......................................................)<br>ผู้อำนวยการโรงเรียนคงคาราม</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Tab 2: Repair Form -->
-            <div id="tab-repair" class="tab-content hidden space-y-6 max-w-4xl mx-auto">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div id="tab-repair" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-2xl mx-auto">
                     <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
                         <i data-lucide="wrench" class="w-5 h-5 text-yellow-600"></i> บันทึกแจ้งซ่อมพัสดุ
                     </h2>
-                    <p class="text-xs text-slate-500 mb-6">บันทึกรายการอุปกรณ์ชำรุดเข้าสู่ระบบเพื่อรอการดำเนินการซ่อมบำรุง</p>
+                    <p class="text-xs text-slate-500 mb-6">บันทึกประวัติการส่งซ่อมหรือชำรุดของอุปกรณ์</p>
                     <form onsubmit="handleRepairSubmit(event)" class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">ค้นหาและเลือกพัสดุที่ต้องการแจ้งซ่อม *</label>
-                            <div class="flex gap-2 mb-2">
-                                <div class="relative flex-1">
-                                    <input type="text" id="repair-search-input" oninput="filterRepairAssetOptions()" placeholder="พิมพ์เลขครุภัณฑ์ หรือ ชื่อพัสดุ เพื่อค้นหา..." class="w-full px-3 py-2 pl-9 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
-                                </div>
-                                <button type="button" onclick="clearRepairAssetSearch()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium">ล้างคำค้น</button>
+                            <div class="relative mb-2">
+                                <input type="text" id="repair-search-input" oninput="filterRepairAssetOptions()" placeholder="พิมพ์เลขครุภัณฑ์ หรือ ชื่อพัสดุเพื่อกรองตัวเลือก..." class="w-full p-2.5 pl-9 border border-indigo-200 bg-indigo-50/50 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-indigo-400"></i>
+                                <button type="button" onclick="clearRepairAssetSearch()" class="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 bg-white px-2 py-0.5 rounded border">ล้าง</button>
                             </div>
+                            <div id="repair-search-count" class="text-xs text-indigo-600 mb-1 font-medium"></div>
                             <select id="repair-asset-select" required onchange="onRepairAssetSelected()" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">-- กรุณาเลือกพัสดุ --</option>
                             </select>
-                            <div id="repair-search-count" class="text-xs text-indigo-600 font-medium mt-1"></div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -193,16 +237,16 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">อาการที่พบ / ปัญหา *</label>
-                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการชำรุดอย่างละเอียด..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                            <textarea id="repair-issue" required rows="3" placeholder="ระบุอาการชำรุด..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่พบอาการ *</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">วันที่พบ *</label>
                                 <input type="date" id="repair-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้งซ่อม *</label>
-                                <input type="text" id="repair-receiver" required placeholder="ระบุชื่อ-นามสกุลผู้แจ้งซ่อม" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ผู้แจ้ง *</label>
+                                <input type="text" id="repair-receiver" required placeholder="ชื่อ-นามสกุลผู้แจ้ง" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                             </div>
                         </div>
                         <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
@@ -211,21 +255,22 @@
                     </form>
                 </div>
 
+                <!-- Active Repair Queue Table -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                         <div>
-                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i> รายการพัสดุที่อยู่ระหว่างแจ้งซ่อม
+                            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i> รายการพัสดุที่อยู่ระหว่างการแจ้งซ่อม (รอการแก้ไข)
                             </h3>
-                            <p class="text-xs text-slate-500">คลิกปุ่ม "บันทึกผลการซ่อม" เพื่อบันทึกผลและย้ายไปยังประวัติการซ่อม</p>
+                            <p class="text-xs text-slate-500">คลิกที่ปุ่ม "บันทึกผลการซ่อม" เพื่ออัปเดตสถานะเมื่อซ่อมบำรุงเสร็จสิ้น</p>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                            <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200 text-xs">
                                 <tr>
-                                    <th class="p-3.5">รหัสการซ่อม</th>
-                                    <th class="p-3.5">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
+                                    <th class="p-3.5">รหัสซ่อม</th>
+                                    <th class="p-3.5">เลขครุภัณฑ์ / พัสดุ</th>
                                     <th class="p-3.5">อาการที่พบ</th>
                                     <th class="p-3.5">วันที่แจ้ง / ผู้แจ้ง</th>
                                     <th class="p-3.5">สถานะ</th>
@@ -238,50 +283,69 @@
                 </div>
             </div>
 
-            <!-- Tab 3: Repair History & Report Engine -->
+            <!-- Tab 3: Repair History -->
             <div id="tab-history" class="tab-content hidden space-y-6">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
-                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                        <div class="relative flex-1 md:w-64">
-                            <input type="text" id="history-search" oninput="renderHistoryTable()" placeholder="สืบค้นเลขครุภัณฑ์, ชื่อ, อาการ..." class="w-full px-3 py-2 pl-9 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4 no-print">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i>
+                            <h2 class="text-lg font-bold text-slate-900">ประวัติการซ่อมบำรุงพัสดุทั้งหมด</h2>
+                            <span id="history-count-badge" class="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full">0 รายการ</span>
                         </div>
-                        <select id="history-filter-status" onchange="renderHistoryTable()" class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">ทุกสถานะ / รายการซ่อมทั้งหมด</option>
-                            <option value="รอซ่อม">รอซ่อม (Active)</option>
-                            <option value="ปกติ">ซ่อมเสร็จปกติ (Completed)</option>
-                            <option value="ชำรุด">ชำรุด / จำหน่าย (Broken)</option>
-                        </select>
-                        <select id="history-filter-month" onchange="renderHistoryTable()" class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">ทุกเดือน</option>
-                            <option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option>
-                            <option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option>
-                            <option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option>
-                            <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
-                        </select>
-                        <select id="history-filter-year" onchange="renderHistoryTable()" class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">ทุกปี พ.ศ.</option>
-                            <option value="2569">2569</option>
-                            <option value="2568">2568</option>
-                            <option value="2567">2567</option>
-                            <option value="2566">2566</option>
-                        </select>
+                        <button onclick="printOfficialReport()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm text-sm font-medium transition">
+                            <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์รายงานการซ่อม A4
+                        </button>
                     </div>
-                    <button onclick="printOfficialReport()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium transition shadow-sm whitespace-nowrap">
-                        <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์รายงานราชการ A4
-                    </button>
+
+                    <!-- Search and Filters -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">ค้นหาคำสำคัญ</label>
+                            <input type="text" id="history-search" oninput="renderHistoryTable()" placeholder="เลขครุภัณฑ์, อาการ, ผู้แจ้ง..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">สถานะผลการซ่อม</label>
+                            <select id="history-filter-status" onchange="renderHistoryTable()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">ทุกสถานะ</option>
+                                <option value="ปกติ">ปกติ (ซ่อมเสร็จแล้ว)</option>
+                                <option value="ชำรุด">ชำรุด (ซ่อมไม่ได้/จำหน่าย)</option>
+                                <option value="รอซ่อม">รอซ่อม (อยู่ระหว่างดำเนินการ)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">ประจำเดือน</label>
+                            <select id="history-filter-month" onchange="renderHistoryTable()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">ทุกเดือน</option>
+                                <option value="01">มกราคม</option>
+                                <option value="02">กุมภาพันธ์</option>
+                                <option value="03">มีนาคม</option>
+                                <option value="04">เมษายน</option>
+                                <option value="05">พฤษภาคม</option>
+                                <option value="06">มิถุนายน</option>
+                                <option value="07">กรกฎาคม</option>
+                                <option value="08">สิงหาคม</option>
+                                <option value="09">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">ประจำปี พ.ศ.</label>
+                            <select id="history-filter-year" onchange="renderHistoryTable()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">ทุกปี</option>
+                                <option value="2026">2569 (2026)</option>
+                                <option value="2025">2568 (2025)</option>
+                                <option value="2024">2567 (2024)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
-                    <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> ประวัติและรายงานการซ่อมบำรุงพัสดุ
-                        </h2>
-                        <span id="history-count-badge" class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold">0 รายการ</span>
-                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">รหัสการซ่อม</th>
                                     <th class="p-4">เลขครุภัณฑ์ / ชื่อพัสดุ</th>
@@ -296,26 +360,26 @@
                     </div>
                 </div>
 
-                <!-- Printable Official A4 Report Section -->
+                <!-- Printable Official Report Section (A4 Format) -->
                 <div id="printable-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
                     <div class="text-center space-y-1 mb-6">
-                        <div class="font-bold text-xl">รายงานสรุปผลการซ่อมบำรุงครุภัณฑ์และพัสดุอุปกรณ์</div>
+                        <div class="font-bold text-xl">รายงานสรุปการซ่อมบำรุงพัสดุอุปกรณ์คอมพิวเตอร์</div>
                         <div class="text-sm">โรงเรียนคงคาราม อำเภอเมือง จังหวัดราชบุรี</div>
-                        <div id="report-date-range-label" class="text-xs text-slate-600 mt-1">ประจำปีงบประมาณ พ.ศ. 2569</div>
+                        <div id="report-date-range-label" class="text-xs text-slate-600 mt-1">สรุปประวัติผลการดำเนินงานซ่อมบำรุงพัสดุประจำโรงเรียน</div>
                     </div>
                     <div class="flex justify-between text-xs mb-4 pb-2 border-b border-slate-300">
-                        <div>ผู้จัดทำรายงาน: <strong>ครูศรันย์กรณ์ อาจณรงค์กร (ครูผู้รับผิดชอบระบบพัสดุ)</strong></div>
-                        <div id="report-printed-timestamp">วันที่พิมพ์: 7 พฤศจิกายน 2569</div>
+                        <div>ผู้จัดทำรายงาน: <strong>ครูศรันย์กรณ์ อาจณรงค์กร</strong></div>
+                        <div id="report-printed-timestamp">วันที่พิมพ์: -</div>
                     </div>
                     <table class="w-full text-left text-xs border-collapse border border-slate-400 mb-8">
                         <thead>
                             <tr class="bg-slate-200 text-slate-900 font-bold">
-                                <th class="border border-slate-400 p-2 text-center w-12">ที่</th>
-                                <th class="border border-slate-400 p-2 w-28">รหัสซ่อม / วันที่</th>
-                                <th class="border border-slate-400 p-2 w-32">เลขครุภัณฑ์</th>
+                                <th class="border border-slate-400 p-2 text-center w-10">ที่</th>
+                                <th class="border border-slate-400 p-2 w-28">รหัสซ่อม/วันที่</th>
+                                <th class="border border-slate-400 p-2 w-28">เลขครุภัณฑ์</th>
                                 <th class="border border-slate-400 p-2">ชื่อพัสดุ / อาการที่พบ</th>
-                                <th class="border border-slate-400 p-2">ผลการซ่อม / การแก้ไข</th>
-                                <th class="border border-slate-400 p-2 w-20 text-center">สถานะ</th>
+                                <th class="border border-slate-400 p-2">สาเหตุและการแก้ไข</th>
+                                <th class="border border-slate-400 p-2 w-20 text-center">ผลการซ่อม</th>
                             </tr>
                         </thead>
                         <tbody id="official-report-tbody"></tbody>
@@ -839,76 +903,41 @@
             reader.readAsText(file);
         }
 
-        function promptClearDatabase() {
-            const pin = prompt("กรุณากรอกรหัส PIN ผู้ดูแลระบบเพื่อยืนยันการล้างฐานข้อมูลทั้งหมด:");
-            if (pin !== '11052524' && pin !== adminPassword) {
-                alert("รหัส PIN ไม่ถูกต้อง!");
-                return;
-            }
-            if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบออกจากระบบและ Google Sheets คุณแน่ใจหรือไม่?")) {
-                clearDatabaseExecution();
-            }
+        function getFilteredInventory() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const year = document.getElementById('year-filter')?.value || '';
+            const dept = document.getElementById('dept-filter')?.value || '';
+
+            return inventoryData.filter(item => {
+                const matchSearch = (item.assetNumber + ' ' + item.assetName + ' ' + item.brandModel + ' ' + item.location + ' ' + item.teacherInCharge).toLowerCase().includes(search);
+                const matchCat = !category || item.category === category;
+                const matchYear = !year || String(item.registrationYear).trim() === year;
+                const matchDept = !dept || item.department === dept;
+                return matchSearch && matchCat && matchYear && matchDept;
+            });
         }
 
-        async function clearDatabaseExecution() {
-            document.getElementById('loading-indicator').classList.remove('hidden');
-            inventoryData = [];
-            repairData = [];
-            futureData = [];
-            renderInventoryTable();
-            renderActiveRepairTable();
-            renderHistoryTable();
-            renderFutureTable();
-            await postToGoogleSheets('clearDatabase', {});
-            document.getElementById('loading-indicator').classList.add('hidden');
-            alert("ล้างฐานข้อมูลทั้งหมดเรียบร้อยแล้ว!");
-        }
-
-        function importCSVData(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                const text = event.target.result;
-                const rows = parseCSV(text);
-                let count = 0;
-                for (let i = 1; i < rows.length; i++) {
-                    const r = rows[i];
-                    if (r.length >= 2 && r[0]) {
-                        const newItem = {
-                            assetNumber: r[0] || '',
-                            assetName: r[1] || '',
-                            category: r[2] || 'คอมพิวเตอร์/อิเล็กทรอนิกส์',
-                            brandModel: r[3] || '',
-                            registrationYear: r[4] || '',
-                            specifications: r[5] || '',
-                            department: r[6] || '',
-                            teacherInCharge: r[7] || '',
-                            location: r[8] || '',
-                            imageUrl: r[9] || ''
-                        };
-                        inventoryData.unshift(newItem);
-                        await postToGoogleSheets('saveInventory', newItem);
-                        count++;
-                    }
-                }
-                renderInventoryTable();
-                renderRepairDropdown();
-                alert(`นำเข้าข้อมูลสำเร็จ ${count} รายการเรียบร้อยแล้ว!`);
-            };
-            reader.readAsText(file);
+        function populateInventoryFilters() {
+            const yearSelect = document.getElementById('year-filter');
+            const deptSelect = document.getElementById('dept-filter');
+            
+            if (yearSelect) {
+                const currentYear = yearSelect.value;
+                const years = [...new Set(inventoryData.map(i => i.registrationYear).filter(Boolean))].sort().reverse();
+                yearSelect.innerHTML = `<option value="">ทุกปี พ.ศ.</option>` + years.map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`).join('');
+            }
+            if (deptSelect) {
+                const currentDept = deptSelect.value;
+                const depts = [...new Set(inventoryData.map(i => i.department).filter(Boolean))].sort();
+                deptSelect.innerHTML = `<option value="">ทุกหน่วยงาน</option>` + depts.map(d => `<option value="${d}" ${d === currentDept ? 'selected' : ''}>${d}</option>`).join('');
+            }
         }
 
         function renderInventoryTable() {
             const tbody = document.getElementById('inventory-table-body');
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const category = document.getElementById('category-filter').value;
-
-            const filtered = inventoryData.filter(item => {
-                const matchSearch = (item.assetNumber + ' ' + item.assetName + ' ' + item.brandModel).toLowerCase().includes(search);
-                const matchCat = !category || item.category === category;
-                return matchSearch && matchCat;
-            });
+            populateInventoryFilters();
+            const filtered = getFilteredInventory();
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">ไม่พบรายการพัสดุ</td></tr>`;
@@ -938,7 +967,46 @@
                     </td>
                 </tr>
             `).join('');
+
+            const printTbody = document.getElementById('inventory-report-tbody');
+            if (printTbody) {
+                printTbody.innerHTML = filtered.map((item, idx) => `
+                    <tr>
+                        <td class="border border-slate-400 p-2 text-center">${idx + 1}</td>
+                        <td class="border border-slate-400 p-2 font-mono text-[11px] font-bold">${item.assetNumber}</td>
+                        <td class="border border-slate-400 p-2"><strong>${item.assetName}</strong><br><span class="text-slate-600">รุ่น: ${item.brandModel || '-'}</span></td>
+                        <td class="border border-slate-400 p-2">${item.category || '-'}</td>
+                        <td class="border border-slate-400 p-2">${item.department || '-'}<br><span class="text-slate-500">ห้อง: ${item.location || '-'}</span></td>
+                        <td class="border border-slate-400 p-2">${item.teacherInCharge || '-'}</td>
+                        <td class="border border-slate-400 p-2 text-center">${item.registrationYear || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+
             if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        }
+
+        function printInventoryOfficialReport() {
+            const category = document.getElementById('category-filter').value;
+            const year = document.getElementById('year-filter').value;
+            const dept = document.getElementById('dept-filter').value;
+
+            let filterTexts = [];
+            if (category) filterTexts.push(`ประเภท: ${category}`);
+            if (year) filterTexts.push(`ปี พ.ศ.: ${year}`);
+            if (dept) filterTexts.push(`หน่วยงาน: ${dept}`);
+
+            let label = "รายงานทะเบียนคุมครุภัณฑ์และพัสดุอุปกรณ์";
+            if (filterTexts.length > 0) {
+                label += ` (` + filterTexts.join(' | ') + `)`;
+            }
+            document.getElementById('inv-report-filter-label').innerText = label;
+
+            const monthsName = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            const now = new Date();
+            document.getElementById('inv-report-printed-timestamp').innerText = `วันที่พิมพ์: ${now.getDate()} ${monthsName[now.getMonth() + 1]} พ.ศ. ${now.getFullYear() + 543}`;
+
+            window.print();
         }
 
         function filterInventory() { renderInventoryTable(); }
