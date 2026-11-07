@@ -20,9 +20,7 @@
         }
         .print-only { display: none; }
     </style>
-    <!-- Global Script Functions Defined Early to Prevent ReferenceError -->
     <script>
-        // Global State
         let sheetId = localStorage.getItem('school_asset_sheet_id') || '1xU8DWN6mPCjjzoKRVD1odekK5kUMZadWoslohlNbJR8';
         let scriptUrl = localStorage.getItem('school_asset_script_url') || 'https://script.google.com/macros/s/AKfycbx0S5d2GT0ZdTHqV3fCldHKG5uzo5HesCJNsUyQc1See2aaPy7HyjXmxJQnRWwXBp--cw/exec';
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
@@ -31,7 +29,6 @@
         let repairData = [];
         let futureData = [];
 
-        // Tab Navigation Global Handler
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
@@ -115,7 +112,6 @@
 
         <!-- Main Content Area -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
-            <!-- Loading Indicator -->
             <div id="loading-indicator" class="flex items-center justify-center py-12 no-print">
                 <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
                 <span class="ml-3 text-slate-600 font-medium">กำลังดึงข้อมูลสดจาก Google Sheets...</span>
@@ -157,9 +153,7 @@
                                     <th class="p-4 text-right">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody id="inventory-table-body" class="divide-y divide-slate-100">
-                                <!-- Data rendered dynamically from Google Sheet -->
-                            </tbody>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -238,9 +232,7 @@
                                     <th class="p-3.5 text-right">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody id="repair-active-table-body" class="divide-y divide-slate-100">
-                                <!-- Active repairs rendered dynamically -->
-                            </tbody>
+                            <tbody id="repair-active-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -248,7 +240,6 @@
 
             <!-- Tab 3: Repair History & Report Engine -->
             <div id="tab-history" class="tab-content hidden space-y-6">
-                <!-- Filter & Action Bar -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
                     <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                         <div class="relative flex-1 md:w-64">
@@ -281,7 +272,6 @@
                     </button>
                 </div>
 
-                <!-- Web Table View -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
                     <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -301,28 +291,22 @@
                                     <th class="p-4">ผลการซ่อม</th>
                                 </tr>
                             </thead>
-                            <tbody id="history-table-body" class="divide-y divide-slate-100">
-                                <!-- Rendered dynamically -->
-                            </tbody>
+                            <tbody id="history-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Printable Official A4 Report Section -->
                 <div id="printable-official-report" class="print-only bg-white p-8 max-w-[210mm] mx-auto text-slate-900" style="font-family: 'Sarabun', sans-serif;">
-                    <!-- Report Header -->
                     <div class="text-center space-y-1 mb-6">
                         <div class="font-bold text-xl">รายงานสรุปผลการซ่อมบำรุงครุภัณฑ์และพัสดุอุปกรณ์</div>
                         <div class="text-sm">โรงเรียนคงคาราม อำเภอเมือง จังหวัดราชบุรี</div>
                         <div id="report-date-range-label" class="text-xs text-slate-600 mt-1">ประจำปีงบประมาณ พ.ศ. 2569</div>
                     </div>
-
                     <div class="flex justify-between text-xs mb-4 pb-2 border-b border-slate-300">
                         <div>ผู้จัดทำรายงาน: <strong>ครูศรันย์กรณ์ อาจณรงค์กร (ครูผู้รับผิดชอบระบบพัสดุ)</strong></div>
                         <div id="report-printed-timestamp">วันที่พิมพ์: 7 พฤศจิกายน 2569</div>
                     </div>
-
-                    <!-- Report Table -->
                     <table class="w-full text-left text-xs border-collapse border border-slate-400 mb-8">
                         <thead>
                             <tr class="bg-slate-200 text-slate-900 font-bold">
@@ -334,12 +318,8 @@
                                 <th class="border border-slate-400 p-2 w-20 text-center">สถานะ</th>
                             </tr>
                         </thead>
-                        <tbody id="official-report-tbody">
-                            <!-- Rendered for print -->
-                        </tbody>
+                        <tbody id="official-report-tbody"></tbody>
                     </table>
-
-                    <!-- Signature Block -->
                     <div class="flex justify-between mt-12 text-sm page-break">
                         <div class="text-center space-y-16 w-64">
                             <div>ลงชื่อ......................................................ผู้รายงาน<br>(นายศรันย์กรณ์ อาจณรงค์กร)<br>ครูผู้รับผิดชอบงานพัสดุ</div>
@@ -377,9 +357,7 @@
                                     <th class="p-4 text-right">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody id="future-table-body" class="divide-y divide-slate-100">
-                                <!-- Data rendered dynamically -->
-                            </tbody>
+                            <tbody id="future-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
@@ -395,9 +373,7 @@
                         <p class="text-sm text-slate-500">จัดการสำรองข้อมูล, กู้คืน, ล้างฐานข้อมูล และนำเข้าไฟล์ CSV</p>
                     </div>
 
-                    <!-- Management Actions Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Backup -->
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="download-cloud" class="w-4 h-4 text-emerald-600"></i> Backup ฐานข้อมูล (JSON)</h3>
@@ -406,7 +382,6 @@
                             <button onclick="backupDatabase()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full">ดาวน์โหลด Backup ข้อมูล</button>
                         </div>
 
-                        <!-- Restore -->
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="upload-cloud" class="w-4 h-4 text-indigo-600"></i> Restore ฐานข้อมูล</h3>
@@ -417,7 +392,6 @@
                             </label>
                         </div>
 
-                        <!-- Delete / Clear DB -->
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i> Delete ฐานข้อมูล (ล้างข้อมูล)</h3>
@@ -426,14 +400,13 @@
                             <button onclick="promptClearDatabase()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full">ล้างฐานข้อมูลทั้งหมด</button>
                         </div>
 
-                        <!-- Import CSV & Template -->
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="file-spreadsheet" class="w-4 h-4 text-amber-600"></i> นำเข้าข้อมูล (CSV / Excel)</h3>
                                 <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ (โครงสร้าง 10 คอลัมน์ตรงตามฟอร์ม)</p>
                             </div>
                             <div class="flex gap-2">
-                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%E0%B8%94%E0%B9%89,%E0%B8%8A%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%AA%E0%B8%94%E0%B8%B8,%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B5%E0%B9%80%E0%B8%A8,%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AB%E0%B9%89%E0%B8%AD%2F%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%81,%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%80%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B0%E0%B8%A8%E0%B8%99%E0%B8%B0%E0%B9%80%E0%B8%88%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B1%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%AD%E0%B8%B9%E0%B9%89%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B8%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9E%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%AD%E0%B8%9A%0A7440-001%2F66,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%AD%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%E0%B8%AC%2F%E0%B9%80%E0%B8%9F%E0%B8%AD%E0%B8%A3%E0%B8%AC%E0%B8%99%E0%B8%B4%E0%B9%80%E0%B8%88%E0%B8%AD%E0%B8%A3%E0%B8%AC,Acer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%E0%B8%94%E0%B9%89,%E0%B8%8A%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%AA%E0%B8%94%E0%B8%B8,%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B5%E0%B9%80%E0%B8%A8,%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AB%E0%B9%89%E0%B8%AD%2F%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%81,%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%80%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B3%E0%B8%93%E0%B8%A5%E0%B8%B0%E0%B8%A8%E0%B8%99%E0%B8%B0%E0%B9%80%E0%B8%88%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B1%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%AD%E0%B8%B9%E0%B9%89%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B8%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9E%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%AD%E0%B8%9A%0A7440-001%2F66,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A4%E0%B8%A0%E0%B8%B1%E0%B8%94%2F%E0%B9%80%E0%B8%9F%E0%B8%AD%E0%B8%A3%E0%B8%AC%E0%B8%99%E0%B8%B4%E0%B9%80%E0%B8%88%E0%B8%AD%E0%B8%A3%E0%B8%AC,Acer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดตัวอย่าง CSV
                                 </a>
                                 <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
@@ -459,7 +432,6 @@
     </div>
 
     <!-- Modals -->
-    <!-- Complete Repair Modal -->
     <div id="complete-repair-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div class="px-6 py-4 bg-emerald-600 text-white flex justify-between items-center">
@@ -613,7 +585,7 @@
         </div>
     </div>
 
-    <!-- Config Modal (Sheet ID & Script URL) -->
+    <!-- Config Modal -->
     <div id="config-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
             <div class="px-6 py-4 bg-slate-800 text-white flex justify-between items-center">
@@ -637,7 +609,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
+    <!-- Main Client Script -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
@@ -760,7 +732,7 @@
                             }
                         }
                     }
-                } catch(e) { console.log("Repair history sheet error or empty"); }
+                } catch(e) { console.log("Repair history error"); }
 
                 try {
                     const futUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=future_inventory`;
@@ -782,7 +754,7 @@
                             }
                         }
                     }
-                } catch(e) { console.log("Future inventory sheet error or empty"); }
+                } catch(e) { console.log("Future inventory error"); }
 
                 renderInventoryTable();
                 renderRepairDropdown();
@@ -813,7 +785,6 @@
             }
         }
 
-        // --- Database Management Functions ---
         function backupDatabase() {
             if (!confirm("คุณต้องการดาวน์โหลดไฟล์สำรองข้อมูล (Backup JSON) ใช่หรือไม่?")) return;
             const backupData = {
@@ -846,8 +817,6 @@
                     if (data.future) futureData = data.future;
 
                     document.getElementById('loading-indicator').classList.remove('hidden');
-                    
-                    // ส่งข้อมูลทั้งหมดไปบันทึกลง Google Sheets ผ่าน Apps Script
                     await postToGoogleSheets('restoreDatabase', {
                         inventory: inventoryData,
                         repairHistory: repairData,
@@ -1178,7 +1147,6 @@
             switchTab('history');
         }
 
-        // --- Filtered History & Report Render Engine ---
         function getFilteredHistory() {
             const search = (document.getElementById('history-search')?.value || '').toLowerCase();
             const statusFilter = document.getElementById('history-filter-status')?.value || '';
@@ -1249,7 +1217,6 @@
                 </tr>
             `).join('');
 
-            // Also prepare printable report tbody
             const printTbody = document.getElementById('official-report-tbody');
             printTbody.innerHTML = filtered.map((item, idx) => `
                 <tr>
@@ -1282,7 +1249,6 @@
             window.print();
         }
 
-        // Future Tab
         function renderFutureTable() {
             const tbody = document.getElementById('future-table-body');
             if (futureData.length === 0) {
