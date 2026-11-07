@@ -726,7 +726,7 @@
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i> Delete ฐานข้อมูล (ล้างข้อมูล)</h3>
-                                <p class="text-xs text-slate-500 mt-1">ล้างข้อมูลพัสดุและประวัติทั้งหมดในระบบ</p>
+                                <p class="text-xs text-slate-500 mt-1">ล้างข้อมูลพัสดุและประวัติทั้งหมดในระบบบน Google Sheets</p>
                             </div>
                             <button onclick="promptClearDatabase()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-medium transition shadow-sm w-full">ล้างฐานข้อมูลทั้งหมด</button>
                         </div>
@@ -737,7 +737,7 @@
                                 <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ (โครงสร้าง 10 คอลัมน์ตรงตามฟอร์ม)</p>
                             </div>
                             <div class="flex gap-2">
-                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%A3%E0%B8%A3%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%90%E0%B8%A3%E0%B8%BE%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B9%8AAcer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%A3%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%90%E0%B8%A3%E0%B8%BE%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B9%8AAcer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดไฟล์ตัวอย่าง CSV
                                 </a>
                                 <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
@@ -769,7 +769,7 @@
             <p class="text-xs text-slate-500 mb-4">สำหรับปริ้นท์ติดบนตัวเครื่องพัสดุ</p>
             <div class="p-4 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50" id="qrcode-print-area">
                 <div class="text-xs font-bold text-slate-800 mb-1">โรงเรียนคงคาราม</div>
-                <div id="qrcode-canvas-container" class="my-2"></div>
+                <div id="qrcode-canvas-container" class="my-2 flex justify-center items-center min-h-[130px]"></div>
                 <div id="qr-asset-number" class="font-mono font-bold text-sm text-indigo-700"></div>
                 <div id="qr-asset-name" class="text-xs text-slate-700 font-semibold truncate max-w-[200px]"></div>
                 <div id="qr-asset-location" class="text-[10px] text-slate-500"></div>
@@ -1367,9 +1367,9 @@
                         </td>
                         <td class="p-4 text-xs text-slate-600">${item.teacherInCharge || '-'}</td>
                         <td class="p-4 text-right space-x-1.5">
-                            <button onclick="openQRCodeModal(${globalIndex})" title="สแกน/พิมพ์ QR Code" class="text-slate-600 hover:text-slate-800 text-xs font-semibold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded">QR</button>
-                            <button onclick="editInventory(${globalIndex})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2 py-1 bg-indigo-50 rounded">แก้ไข</button>
-                            <button onclick="deleteInventory(${globalIndex})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2 py-1 bg-red-50 rounded">ลบ</button>
+                            <button onclick="openQRCodeModal(${globalIndex})" title="สแกน/พิมพ์ QR Code" class="text-slate-600 hover:text-slate-800 text-xs font-semibold px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded transition">QR</button>
+                            <button onclick="editInventory(${globalIndex})" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2 py-1 bg-indigo-50 hover:bg-indigo-100 rounded transition">แก้ไข</button>
+                            <button onclick="deleteInventory(${globalIndex})" class="text-red-600 hover:text-red-800 text-xs font-semibold px-2 py-1 bg-red-50 hover:bg-red-100 rounded transition">ลบ</button>
                         </td>
                     </tr>
                 `;
@@ -1380,23 +1380,47 @@
 
         function filterInventory() { renderInventoryTable(); }
 
+        // แก้ไขปรับปรุงฟังก์ชัน openQRCodeModal ให้มี Try-Catch และ Fallback Dynamic Image
         function openQRCodeModal(idx) {
-            const item = inventoryData[idx];
-            if (!item) return;
-            document.getElementById('qr-asset-number').innerText = item.assetNumber;
-            document.getElementById('qr-asset-name').innerText = item.assetName;
-            document.getElementById('qr-asset-location').innerText = `ห้อง: ${item.location || '-'} (${item.department || '-'})`;
+            try {
+                const item = inventoryData[idx];
+                if (!item) {
+                    showAlert("ข้อผิดพลาด", "ไม่พบข้อมูลพัสดุรายการนี้", "error");
+                    return;
+                }
+                const qrText = (item.assetNumber && String(item.assetNumber).trim()) ? String(item.assetNumber).trim() : (item.assetName || 'NO-ASSET-ID');
 
-            const container = document.getElementById('qrcode-canvas-container');
-            container.innerHTML = '';
-            if (typeof QRCode !== 'undefined') {
-                new QRCode(container, {
-                    text: item.assetNumber,
-                    width: 120,
-                    height: 120
-                });
+                document.getElementById('qr-asset-number').innerText = item.assetNumber || '-';
+                document.getElementById('qr-asset-name').innerText = item.assetName || '-';
+                document.getElementById('qr-asset-location').innerText = `ห้อง: ${item.location || '-'} (${item.department || '-'})`;
+
+                const container = document.getElementById('qrcode-canvas-container');
+                container.innerHTML = '';
+
+                // ลองใช้ QRCode JS ก่อน หากพบปัญหาจะใช้ API fallback
+                let generated = false;
+                if (typeof QRCode !== 'undefined') {
+                    try {
+                        new QRCode(container, {
+                            text: qrText,
+                            width: 120,
+                            height: 120
+                        });
+                        generated = true;
+                    } catch (e) {
+                        console.warn("QRCode JS error, using fallback API:", e);
+                    }
+                }
+
+                if (!generated) {
+                    container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrText)}" alt="QR Code" class="w-30 h-30 mx-auto">`;
+                }
+
+                document.getElementById('qrcode-modal').classList.remove('hidden');
+            } catch (err) {
+                console.error("openQRCodeModal Error:", err);
+                showAlert("ข้อผิดพลาด", "เกิดปัญหาขณะแสดง QR Code: " + err.message, "error");
             }
-            document.getElementById('qrcode-modal').classList.remove('hidden');
         }
 
         function closeQRCodeModal() {
@@ -2147,32 +2171,36 @@
             reader.readAsText(file);
         }
 
+        // ปรับปรุงฟังก์ชันล้างฐานข้อมูล ให้ทำงานได้แน่นอนบน Google Sheets
         function promptClearDatabase() {
             if (!scriptUrl) {
                 showAlert("จำเป็นต้องตั้งค่า", "กรุณาตั้งค่า Google Apps Script Web App API URL ก่อนใช้งานฟังก์ชันนี้", "error");
                 openConfigModal();
                 return;
             }
-            showConfirm("คำเตือน: ล้างฐานข้อมูลทั้งหมด", "ข้อมูลทั้งหมดจะถูกลบถาวรจาก Google Sheets คุณต้องการดำเนินการจริงหรือไม่?", async () => {
+            showConfirm("คำเตือน: ล้างฐานข้อมูลทั้งหมด", "ข้อมูลพัสดุและประวัติทั้งหมดจะถูกลบถาวรจาก Google Sheets คุณต้องการดำเนินการจริงหรือไม่?", async () => {
                 document.getElementById('loading-indicator').classList.remove('hidden');
                 try {
-                    await postToGoogleSheets('clearDatabase', {});
-                    inventoryData = [];
-                    borrowData = [];
-                    repairData = [];
-                    futureData = [];
+                    const res = await postToGoogleSheets('clearDatabase', {});
+                    if (res && res.success !== false) {
+                        inventoryData = [];
+                        borrowData = [];
+                        repairData = [];
+                        futureData = [];
 
-                    updateDashboardStats();
-                    updateFilterDropdowns();
-                    renderInventoryTable();
-                    renderDisposedTable();
-                    renderBorrowTable();
-                    renderActiveRepairTable();
-                    renderHistoryTable();
-                    renderFutureTable();
+                        updateDashboardStats();
+                        updateFilterDropdowns();
+                        renderInventoryTable();
+                        renderDisposedTable();
+                        renderBorrowTable();
+                        renderActiveRepairTable();
+                        renderHistoryTable();
+                        renderFutureTable();
 
-                    showAlert("สำเร็จ", "ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว", "success");
-                    await fetchGoogleSheetsData();
+                        showAlert("สำเร็จ", "ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว", "success");
+                    } else {
+                        showAlert("ข้อผิดพลาด", (res && res.error) || "ไม่สามารถล้างฐานข้อมูลได้", "error");
+                    }
                 } catch (err) {
                     console.error("Clear database error:", err);
                     showAlert("ข้อผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ Google Apps Script", "error");
