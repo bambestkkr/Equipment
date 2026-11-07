@@ -630,6 +630,38 @@
     </div>
 
     <!-- Complete Repair Modal -->
+    <div id="complete-repair-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 bg-emerald-600 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> บันทึกผลการซ่อมพัสดุ
+                </h3>
+                <button onclick="closeCompleteRepairModal()" class="text-white hover:bg-emerald-700 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleCompleteRepairSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="comp-repair-id" value="">
+                <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-xs space-y-1">
+                    <div><strong>รหัสการซ่อม:</strong> <span id="comp-disp-repair-id" class="font-mono font-bold text-emerald-700"></span></div>
+                    <div><strong>พัสดุ:</strong> <span id="comp-disp-asset-info" class="font-bold text-slate-800"></span></div>
+                    <div><strong>อาการที่พบ:</strong> <span id="comp-disp-issue" class="text-slate-600"></span></div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">สาเหตุของปัญหา *</label>
+                    <textarea id="comp-cause" required rows="2" placeholder="ระบุสาเหตุที่พบ..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">วิธีการแก้ไข / อะไหล่ที่เปลี่ยน *</label>
+                    <textarea id="comp-solution" required rows="2" placeholder="ระบุวิธีแก้ไข..." class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">วันที่ซ่อมเสร็จ *</label>
+                        <input type="date" id="comp-finish-date" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ผลการซ่อม (สถานะ) *</label>
+                        <select id="comp-status" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="ปกติ">ปกติ (ใช้งานได้ดีแล้ว)</option>
                             <option value="ชำรุด">ชำรุด (ซ่อมไม่ได้ / จำหน่ายออก)</option>
                         </select>
                     </div>
@@ -1016,7 +1048,7 @@
             const dept = document.getElementById('dept-filter')?.value || '';
 
             return inventoryData.filter(item => {
-                if (item.isDisposed) return false; // ซ่อนพัสดุที่ถูกจำหน่ายออกจากทะเบียนหลัก
+                if (item.isDisposed) return false;
                 const matchSearch = (item.assetNumber + ' ' + item.assetName + ' ' + item.brandModel + ' ' + item.location + ' ' + item.teacherInCharge).toLowerCase().includes(search);
                 const matchCat = !category || item.category === category;
                 const matchYear = !year || String(item.registrationYear).trim() === year;
