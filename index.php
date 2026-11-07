@@ -1,3 +1,7 @@
+<?php
+// ตั้งค่า Content-Type และ Encoding สำหรับ PHP Server
+header('Content-Type: text/html; charset=UTF-8');
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -23,15 +27,18 @@
         .print-only { display: none; }
     </style>
     <script>
+        // กำหนดค่าเริ่มต้นของ Sheet ID และ Script URL ใน LocalStorage
         let sheetId = localStorage.getItem('school_asset_sheet_id') || '1IAURmSXWIIt7c4zAXaQaAJMN08fslDujD6O7DLZipmo';
         let scriptUrl = localStorage.getItem('school_asset_script_url') || '';
         let adminPassword = localStorage.getItem('school_asset_admin_pwd') || '19111986';
 
+        // โครงสร้างตัวแปรเก็บข้อมูลระบบ
         let inventoryData = [];
         let borrowData = [];
         let repairData = [];
         let futureData = [];
 
+        // ฟังก์ชันสลับหน้า Tab
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
@@ -52,6 +59,38 @@
     </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Custom Alert Notification Modal (แทนการใช้ alert สด) -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+            <div id="alert-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-indigo-100 text-indigo-600">
+                <i data-lucide="info" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 id="alert-title" class="text-lg font-bold text-slate-900">แจ้งเตือน</h3>
+                <p id="alert-message" class="text-sm text-slate-600 mt-1"></p>
+            </div>
+            <button onclick="closeAlertModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition text-sm">ตกลง</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Dialog Modal (แทนการใช้ confirm สด) -->
+    <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-amber-100 text-amber-600">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 id="confirm-title" class="text-lg font-bold text-slate-900">ยืนยันการทำรายการ</h3>
+                <p id="confirm-message" class="text-sm text-slate-600 mt-1"></p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition text-sm">ยกเลิก</button>
+                <button onclick="closeConfirmModal(true)" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition text-sm">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Screen -->
     <div id="login-screen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center border border-slate-100">
@@ -702,7 +741,7 @@
                                 <p class="text-xs text-slate-500 mt-1">อัปโหลดไฟล์ CSV รายการพัสดุเข้าสู่ระบบ (โครงสร้าง 10 คอลัมน์ตรงตามฟอร์ม)</p>
                             </div>
                             <div class="flex gap-2">
-                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%A3%E0%B8%A3%E0%B8%A1%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%90%E0%B8%A3%E0%B8%BE%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B9%8AAcer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
+                                <a href="data:text/csv;charset=utf-8,%E0%B9%80%E0%B8%A5%E0%B8%82%E0%B8%84%E0%B8%A3%E0%B8%B8%E0%B8%A9%E0%B8%93%E0%B9%8C%20*%2C%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%9E%E0%B8%B1%E0%B8%AA%E0%B8%94%E0%B8%B8%20*%2C%E0%B9%80%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B9%80%E0%B8%A8%E0%B8%97%20*%2C%E0%B8%A2%E0%B8%B5%E0%B9%88%E0%B8%AD%20%2F%20%E0%B8%A3%E0%B8%B8%E0%B8%98%E0%B8%99,%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A5%E0%B8%87%E0%B8%97%E0%B8%B0%E0%B9%80%E0%B8%9B%E0%B8%B5%E0%B8%A2%E0%B8%99,%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%A9%E0%B8%93%E0%B8%B0%E0%B9%80%E0%B8%89%E0%B8%9E%E0%B8%B0,%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%AD%E0%B8%A2%E0%B8%87%E0%B8%B2%E0%B8%99,%E0%B8%84%E0%B8%A3%E0%B8%A3%E0%B8%A3%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%8A%E0%B8%AD%E0%B8%9A,%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%B3%E0%B8%AB%E0%B9%89%E0%B8%AD%E0%B8%87,%E0%B8%A5%E0%B8%B4%E0%B9%89%E0%B8%87%E0%B8%A5%E0%B8%B2%E0%B8%9F%E0%B8%9B%E0%B8%A3%E0%B8%81%E0%B8%AD%E0%B8%90%20%28URL%29%0A7440-001%2F67,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC,%E0%B9%80%E0%B8%84%E0%B5%88%E0%B8%AD%E0%B8%87%E0%B8%84%E0%B8%AD%E0%B8%A1%E0%B9%80%E0%B8%9E%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B8%AC%2F%E0%B9%80%E0%B8%AD%E0%B8%A5%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B8%90%E0%B8%A3%E0%B8%BE%E0%B8%94%E0%B8%B4%E0%B8%81%E0%B9%8AAcer%20C24,2566,Core%20i5%20RAM%208GB,วิทยาศาสตร์และเทคโนโลยี,ครูศรันย์กรณ์,ห้องคอมพิวเตอร์,https%3A%2F%2Fplacehold.co%2F600x400" download="Inventory_Template.csv" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1">
                                     <i data-lucide="download" class="w-3.5 h-3.5"></i> โหลดไฟล์ตัวอย่าง CSV
                                 </a>
                                 <label class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-medium text-center transition flex-1 flex items-center justify-center gap-1 cursor-pointer">
@@ -958,8 +997,50 @@
         </div>
     </div>
 
-    <!-- Main Client Script -->
+    <!-- Main Client Script Logic -->
     <script>
+        let pendingConfirmCallback = null;
+
+        // ฟังก์ชันสร้าง Custom Alert Notification
+        function showAlert(title, message, type = 'info') {
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            
+            const iconContainer = document.getElementById('alert-icon-container');
+            if (type === 'success') {
+                iconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-emerald-100 text-emerald-600';
+                iconContainer.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i>`;
+            } else if (type === 'error') {
+                iconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-rose-100 text-rose-600';
+                iconContainer.innerHTML = `<i data-lucide="alert-octagon" class="w-6 h-6"></i>`;
+            } else {
+                iconContainer.className = 'w-12 h-12 rounded-full flex items-center justify-center mx-auto bg-indigo-100 text-indigo-600';
+                iconContainer.innerHTML = `<i data-lucide="info" class="w-6 h-6"></i>`;
+            }
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+            document.getElementById('custom-alert-modal').classList.remove('hidden');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('custom-alert-modal').classList.add('hidden');
+        }
+
+        // ฟังก์ชันสร้าง Custom Confirm Dialog
+        function showConfirm(title, message, onConfirm) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            pendingConfirmCallback = onConfirm;
+            document.getElementById('custom-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal(result) {
+            document.getElementById('custom-confirm-modal').classList.add('hidden');
+            if (result && typeof pendingConfirmCallback === 'function') {
+                pendingConfirmCallback();
+            }
+            pendingConfirmCallback = null;
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
                 lucide.createIcons();
@@ -1369,20 +1450,20 @@
             renderInventoryTable();
             closeInventoryModal();
             await postToGoogleSheets('saveInventory', newItem);
-            alert("บันทึกรายการพัสดุเรียบร้อยแล้ว!");
+            showAlert("สำเร็จ", "บันทึกข้อมูลรายการพัสดุเรียบร้อยแล้ว!", "success");
         }
 
         function editInventory(idx) { openInventoryModal(idx); }
 
-        async function deleteInventory(idx) {
-            if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
+        function deleteInventory(idx) {
+            showConfirm("ยืนยันการลบ", "คุณต้องการลบรายการพัสดุชิ้นนี้ออกจากระบบใช่หรือไม่?", async () => {
                 const deletedItem = inventoryData[idx];
                 inventoryData.splice(idx, 1);
                 updateDashboardStats();
                 renderInventoryTable();
                 await postToGoogleSheets('deleteInventory', deletedItem);
-                alert("ลบรายการพัสดุเรียบร้อยแล้ว");
-            }
+                showAlert("สำเร็จ", "ลบรายการพัสดุเรียบร้อยแล้ว", "success");
+            });
         }
 
         function searchAssetForDisposal() {
@@ -1406,24 +1487,23 @@
             }
         }
 
-        async function openConfirmDisposalModal() {
+        function openConfirmDisposalModal() {
             const num = document.getElementById('disp-result-asset-num').innerText;
-            const reason = prompt("กรุณาระบุเหตุผลการจำหน่ายพัสดุ:", "ชำรุดตามสภาพ/ไม่คุ้มค่าซ่อม");
-            if (reason) {
+            showConfirm("ยืนยันการจำหน่ายออก", `คุณต้องการจำหน่ายพัสดุหมายเลข ${num} ออกจากระบบใช่หรือไม่?`, async () => {
                 const item = inventoryData.find(i => i.assetNumber === num);
                 if (item) {
                     item.isDisposed = true;
                     item.disposeDate = new Date().toISOString().substring(0, 10);
-                    item.disposeReason = reason;
+                    item.disposeReason = "ชำรุดตามสภาพ/ไม่คุ้มค่าซ่อม";
                     updateDashboardStats();
                     renderInventoryTable();
                     renderDisposedTable();
                     document.getElementById('dispose-search-result').classList.add('hidden');
                     document.getElementById('dispose-search-input').value = '';
                     await postToGoogleSheets('disposeInventory', item);
-                    alert("บันทึกการจำหน่ายพัสดุเรียบร้อยแล้ว!");
+                    showAlert("สำเร็จ", "บันทึกการจำหน่ายพัสดุเรียบร้อยแล้ว!", "success");
                 }
-            }
+            });
         }
 
         function renderDisposedTable() {
@@ -1454,16 +1534,16 @@
             }).join('');
         }
 
-        async function cancelDisposal(idx) {
-            if (confirm("คุณต้องการยกเลิกการจำหน่ายพัสดุชิ้นนี้เพื่อนำกลับเข้าสู่ทะเบียนใช่หรือไม่?")) {
+        function cancelDisposal(idx) {
+            showConfirm("ยกเลิกการจำหน่าย", "คุณต้องการยกเลิกการจำหน่ายพัสดุชิ้นนี้เพื่อนำกลับเข้าสู่ทะเบียนใช่หรือไม่?", async () => {
                 inventoryData[idx].isDisposed = false;
                 const item = inventoryData[idx];
                 updateDashboardStats();
                 renderInventoryTable();
                 renderDisposedTable();
                 await postToGoogleSheets('cancelDisposal', item);
-                alert("ยกเลิกการจำหน่ายเรียบร้อยแล้ว!");
-            }
+                showAlert("สำเร็จ", "ยกเลิกการจำหน่ายเรียบร้อยแล้ว!", "success");
+            });
         }
 
         function filterBorrowAssetOptions() {
@@ -1526,7 +1606,7 @@
             updateDashboardStats();
             renderBorrowTable();
             await postToGoogleSheets('saveBorrow', newBorrow);
-            alert("บันทึกทำรายการยืมพัสดุเรียบร้อยแล้ว!");
+            showAlert("สำเร็จ", "บันทึกทำรายการยืมพัสดุเรียบร้อยแล้ว!", "success");
             e.target.reset();
             renderBorrowDropdown();
             clearBorrowAssetSearch();
@@ -1647,7 +1727,7 @@
                 note: note
             });
 
-            alert("บันทึกรับคืนพัสดุเรียบร้อยแล้ว!");
+            showAlert("สำเร็จ", "บันทึกรับคืนพัสดุเรียบร้อยแล้ว!", "success");
         }
 
         function printBorrowOfficialReport() {
@@ -1721,7 +1801,7 @@
             updateDashboardStats();
             renderActiveRepairTable();
             await postToGoogleSheets('saveRepair', newRepair);
-            alert("บันทึกแจ้งซ่อมเรียบร้อยแล้ว!");
+            showAlert("สำเร็จ", "บันทึกแจ้งซ่อมพัสดุเรียบร้อยแล้ว!", "success");
             e.target.reset();
             document.getElementById('repair-date').value = new Date().toISOString().substring(0, 10);
             clearRepairAssetSearch();
@@ -1809,7 +1889,7 @@
                 status: status
             });
 
-            alert("บันทึกผลการซ่อมเรียบร้อยแล้ว!");
+            showAlert("สำเร็จ", "บันทึกผลการซ่อมพัสดุเรียบร้อยแล้ว!", "success");
             switchTab('history');
         }
 
@@ -1979,7 +2059,16 @@
             renderFutureTable();
             closeFutureModal();
             await postToGoogleSheets('saveFuture', newItem);
-            alert("บันทึกข้อมูลพัสดุปีหน้าเรียบร้อยแล้ว!");
+            showAlert("สำเร็จ", "บันทึกข้อมูลพัสดุปีหน้าเรียบร้อยแล้ว!", "success");
+        }
+
+        function deleteFuture(idx) {
+            showConfirm("ยืนยันการลบ", "คุณต้องการลบรายการพัสดุปีหน้าชิ้นนี้ใช่หรือไม่?", async () => {
+                futureData.splice(idx, 1);
+                renderFutureTable();
+                await postToGoogleSheets('deleteFuture', { index: idx });
+                showAlert("สำเร็จ", "ลบรายการเรียบร้อยแล้ว", "success");
+            });
         }
 
         async function backupDatabase() {
@@ -1999,7 +2088,7 @@
 
         async function restoreDatabase(event) {
             if (!scriptUrl) {
-                alert("กรุณาตั้งค่า Google Apps Script Web App API URL ก่อนใช้งานฟังก์ชัน Restore (กดปุ่ม 'ตั้งค่า Sheet ID & Web App URL' ด้านบน)");
+                showAlert("จำเป็นต้องตั้งค่า", "กรุณาตั้งค่า Google Apps Script Web App API URL ก่อนใช้งานฟังก์ชัน Restore", "error");
                 openConfigModal();
                 event.target.value = '';
                 return;
@@ -2012,12 +2101,12 @@
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (!parsed.inventory && !parsed.repairHistory) {
-                        alert("ไฟล์ JSON ไม่ถูกต้องตามโครงสร้างระบบพัสดุ");
+                        showAlert("ข้อผิดพลาด", "ไฟล์ JSON ไม่ถูกต้องตามโครงสร้างระบบพัสดุ", "error");
                         event.target.value = '';
                         return;
                     }
 
-                    if (confirm("คุณต้องการกู้คืนข้อมูล (Restore) และซิงค์ทับข้อมูลทั้งหมดลง Google Sheets ใช่หรือไม่?")) {
+                    showConfirm("ยืนยันการกู้คืนข้อมูล", "คุณต้องการกู้คืนข้อมูล (Restore) และซิงค์ทับข้อมูลทั้งหมดลง Google Sheets ใช่หรือไม่?", async () => {
                         document.getElementById('loading-indicator').classList.remove('hidden');
                         
                         await postToGoogleSheets('restoreDatabase', parsed);
@@ -2037,56 +2126,51 @@
                         renderFutureTable();
 
                         document.getElementById('loading-indicator').classList.add('hidden');
-                        alert("กู้คืนข้อมูล (Restore) และซิงค์ลง Google Sheets สำเร็จเรียบร้อย!");
-                    }
+                        showAlert("สำเร็จ", "กู้คืนข้อมูล (Restore) และซิงค์ลง Google Sheets สำเร็จเรียบร้อย!", "success");
+                    });
                 } catch(err) {
                     console.error("Restore parse error:", err);
                     document.getElementById('loading-indicator').classList.add('hidden');
-                    alert("เกิดข้อผิดพลาดในการอ่านไฟล์ JSON หรือเชื่อมต่อ Server");
+                    showAlert("ข้อผิดพลาด", "เกิดข้อผิดพลาดในการอ่านไฟล์ JSON หรือเชื่อมต่อ Server", "error");
                 }
                 event.target.value = '';
             };
             reader.readAsText(file);
         }
 
-        async function promptClearDatabase() {
+        function promptClearDatabase() {
             if (!scriptUrl) {
-                alert("กรุณาตั้งค่า Google Apps Script Web App API URL ก่อนใช้งานฟังก์ชันนี้ (กดปุ่ม 'ตั้งค่า Sheet ID & Web App URL' ด้านบน)");
+                showAlert("จำเป็นต้องตั้งค่า", "กรุณาตั้งค่า Google Apps Script Web App API URL ก่อนใช้งานฟังก์ชันนี้", "error");
                 openConfigModal();
                 return;
             }
-            const pwd = prompt("กรุณากรอกรหัส PIN เพื่อยืนยันการล้างฐานข้อมูล:");
-            if (pwd === '11052524' || pwd === adminPassword) {
-                if (confirm("คำเตือน: ข้อมูลทั้งหมดจะถูกลบถาวรจาก Google Sheets ต้องการดำเนินการหรือไม่?")) {
-                    document.getElementById('loading-indicator').classList.remove('hidden');
-                    try {
-                        await postToGoogleSheets('clearDatabase', {});
-                        inventoryData = [];
-                        borrowData = [];
-                        repairData = [];
-                        futureData = [];
+            showConfirm("คำเตือน: ล้างฐานข้อมูลทั้งหมด", "ข้อมูลทั้งหมดจะถูกลบถาวรจาก Google Sheets คุณต้องการดำเนินการจริงหรือไม่?", async () => {
+                document.getElementById('loading-indicator').classList.remove('hidden');
+                try {
+                    await postToGoogleSheets('clearDatabase', {});
+                    inventoryData = [];
+                    borrowData = [];
+                    repairData = [];
+                    futureData = [];
 
-                        updateDashboardStats();
-                        updateFilterDropdowns();
-                        renderInventoryTable();
-                        renderDisposedTable();
-                        renderBorrowTable();
-                        renderActiveRepairTable();
-                        renderHistoryTable();
-                        renderFutureTable();
+                    updateDashboardStats();
+                    updateFilterDropdowns();
+                    renderInventoryTable();
+                    renderDisposedTable();
+                    renderBorrowTable();
+                    renderActiveRepairTable();
+                    renderHistoryTable();
+                    renderFutureTable();
 
-                        alert("ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว");
-                        await fetchGoogleSheetsData();
-                    } catch (err) {
-                        console.error("Clear database error:", err);
-                        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Apps Script");
-                    } finally {
-                        document.getElementById('loading-indicator').classList.add('hidden');
-                    }
+                    showAlert("สำเร็จ", "ล้างฐานข้อมูลบน Google Sheets เรียบร้อยแล้ว", "success");
+                    await fetchGoogleSheetsData();
+                } catch (err) {
+                    console.error("Clear database error:", err);
+                    showAlert("ข้อผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ Google Apps Script", "error");
+                } finally {
+                    document.getElementById('loading-indicator').classList.add('hidden');
                 }
-            } else if (pwd !== null) {
-                alert("รหัสผ่านไม่ถูกต้อง");
-            }
+            });
         }
 
         async function importCSVData(event) {
@@ -2122,7 +2206,7 @@
                     updateDashboardStats();
                     updateFilterDropdowns();
                     renderInventoryTable();
-                    alert("นำเข้าข้อมูล CSV และบันทึกลง Google Sheets เรียบร้อยแล้ว!");
+                    showAlert("สำเร็จ", "นำเข้าข้อมูล CSV และบันทึกลง Google Sheets เรียบร้อยแล้ว!", "success");
                 }
             };
             reader.readAsText(file);
@@ -2176,9 +2260,9 @@
                 document.getElementById('display-sheet-id').innerText = sheetId;
                 closeConfigModal();
                 fetchGoogleSheetsData();
-                alert("บันทึกการตั้งค่า Sheet ID เรียบร้อยแล้ว!");
+                showAlert("สำเร็จ", "บันทึกการตั้งค่า Sheet ID เรียบร้อยแล้ว!", "success");
             } else {
-                alert("กรุณากรอก Sheet ID ให้ถูกต้อง");
+                showAlert("ข้อผิดพลาด", "กรุณากรอก Sheet ID ให้ถูกต้อง", "error");
             }
         }
     </script>
