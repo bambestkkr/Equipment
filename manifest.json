@@ -1,7 +1,7 @@
 {
   "name": "วัสดุครุภัณฑ์1204",
-  "short_name": "ฺEquipment",
-  "description": "พัสดุ1204",
+  "short_name": "ฺพัสดุ1204",
+  "description": "Equipment-พัสดุ1204",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
